@@ -70,14 +70,23 @@ const Map = ({ floorNumber, roomNumber }) => {
     return () => clearInterval(intervalId); // Clean up on component unmount
   }, []);
 
+  const getFloorLabel = (floor) => {
+    switch (floor) {
+      case '0': return 'EG';
+      case '1': return '1. OG';
+      case '2': return '2. OG';
+      case '3': return '3. OG';
+      default: return `${floor}. OG`;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Aktuelles Ziel:</Text>
-        <Text style={styles.roomInfo}>Etage: {floorNumber}</Text>
-        <Text style={styles.roomInfo}>Raum: {roomNumber}</Text>
-        <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
+        <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
       </View>
+      <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
     </SafeAreaView>
   );
 };
@@ -85,13 +94,21 @@ const Map = ({ floorNumber, roomNumber }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   content: {
-    padding: 20,
     backgroundColor: '#f0f0f0',
-    borderRadius: 10,
+    padding: 20,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   title: {
     fontSize: 18,
@@ -101,12 +118,12 @@ const styles = StyleSheet.create({
   roomInfo: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 5,
   },
   wifiInfo: {
-    marginTop: 10,
+    margin: 20,
     fontSize: 14,
     fontStyle: 'italic',
+    textAlign: 'center',
   },
 });
 
