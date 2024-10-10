@@ -3,6 +3,11 @@ import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid } fr
 import WifiManager from "react-native-wifi-reborn";
 import ImageGallery from './ImageGallery';
 
+interface ImageItem {
+  url: string;
+  description: string;
+}
+
 const Map = ({ floorNumber, roomNumber }) => {
   const [wifiInfo, setWifiInfo] = React.useState(null);
 
@@ -82,12 +87,27 @@ const Map = ({ floorNumber, roomNumber }) => {
   };
 
     // Sample array of image URLs
-    const images = [
-      'https://picsum.photos/seed/696/3000/2000',
-      'https://picsum.photos/seed/697/3000/2000',
-      'https://picsum.photos/seed/698/3000/2000',
-      'https://picsum.photos/seed/699/3000/2000',
-      'https://picsum.photos/seed/700/3000/2000',
+    const images: ImageItem[] = [
+      {
+        url: 'https://picsum.photos/seed/696/3000/2000',
+        description: 'A scenic view of a mountain landscape with a lake in the foreground'
+      },
+      {
+        url: 'https://picsum.photos/seed/697/3000/2000',
+        description: 'A bustling city street with tall buildings and people walking'
+      },
+      {
+        url: 'https://picsum.photos/seed/698/3000/2000',
+        description: 'A close-up of a colorful flower with dewdrops on its petals'
+      },
+      {
+        url: 'https://picsum.photos/seed/699/3000/2000',
+        description: 'A serene beach scene with white sand and clear blue water'
+      },
+      {
+        url: 'https://picsum.photos/seed/700/3000/2000',
+        description: 'An aerial view of a dense forest with various shades of green'
+      }
     ];
   
 
