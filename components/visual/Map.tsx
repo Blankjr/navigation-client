@@ -81,12 +81,15 @@ const Map = ({ floorNumber, roomNumber }) => {
     }
   };
 
-   // Sample array of image URLs
-   const images = [
-    'https://picsum.photos/seed/696/3000/2000',
-    'https://picsum.photos/seed/697/3000/2000',
-    'https://picsum.photos/seed/698/3000/2000',
-  ];
+    // Sample array of image URLs
+    const images = [
+      'https://picsum.photos/seed/696/3000/2000',
+      'https://picsum.photos/seed/697/3000/2000',
+      'https://picsum.photos/seed/698/3000/2000',
+      'https://picsum.photos/seed/699/3000/2000',
+      'https://picsum.photos/seed/700/3000/2000',
+    ];
+  
 
   return (
     <SafeAreaView style={styles.container}>
