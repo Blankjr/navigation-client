@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid } from 'react-native';
 import WifiManager from "react-native-wifi-reborn";
+import ImageGallery from './ImageGallery';
 
 const Map = ({ floorNumber, roomNumber }) => {
   const [wifiInfo, setWifiInfo] = React.useState(null);
@@ -80,13 +81,23 @@ const Map = ({ floorNumber, roomNumber }) => {
     }
   };
 
+   // Sample array of image URLs
+   const images = [
+    'https://picsum.photos/seed/696/3000/2000',
+    'https://picsum.photos/seed/697/3000/2000',
+    'https://picsum.photos/seed/698/3000/2000',
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Aktuelles Ziel:</Text>
         <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
       </View>
-      <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
+      <View style={styles.middleContent}>
+        <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
+      </View>
+      <ImageGallery images={images} />
     </SafeAreaView>
   );
 };
@@ -110,6 +121,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  middleContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -120,7 +137,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   wifiInfo: {
-    margin: 20,
     fontSize: 14,
     fontStyle: 'italic',
     textAlign: 'center',
