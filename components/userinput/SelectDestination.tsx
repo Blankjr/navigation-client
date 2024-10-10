@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { Button, SegmentedButtons, TextInput } from 'react-native-paper';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView } from 'react-native';
 
 const SelectDestination = ({ onSearch }) => {
   const [floorNumber, setFloorNumber] = React.useState('');
   const [roomNumber, setRoomNumber] = React.useState('');
+
+  const handleSearch = () => {
+    onSearch(floorNumber, roomNumber);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -12,11 +16,12 @@ const SelectDestination = ({ onSearch }) => {
         value={floorNumber}
         onValueChange={setFloorNumber}
         buttons={[
-          { value: '0', label: 'Etage 0' },
-          { value: '1', label: 'Etage 1' },
-          { value: '2', label: 'Etage 2' },
-          { value: '3', label: 'Etage 3' },
+          { value: '0', label: 'EG' },
+          { value: '1', label: '1 OG' },
+          { value: '2', label: '2 OG' },
+          { value: '3', label: '3 OG' },
         ]}
+        style={styles.segmentedButtons}
       />
       <TextInput
         placeholder={'Raum-Nummer'}
@@ -29,9 +34,9 @@ const SelectDestination = ({ onSearch }) => {
       <Button
         icon="airplane-search"
         mode="contained"
-        onPress={() => onSearch(floorNumber, roomNumber)}
+        onPress={handleSearch}
       >
-        Weg Suche
+        Ziel wählen
       </Button>
     </SafeAreaView>
   );
@@ -41,12 +46,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginHorizontal: 10,
-    marginTop: 275,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  segmentedButtons: {
+    marginBottom: 20,
   },
   roomInput: {
-    margin: 18,
-    paddingHorizontal: 5,
+    width: '100%',
+    marginBottom: 20,
   },
 });
 

@@ -13,9 +13,9 @@ export default function Index() {
     { key: 'map', title: 'Karte', unfocusedIcon: 'map-legend', focusedIcon: 'map-search' },
   ];
 
-  const handleSearch = (floorNumber, roomNumber) => {
-    setFloorNumber(floorNumber);
-    setRoomNumber(roomNumber);
+  const handleSearch = (floor, room) => {
+    setFloorNumber(floor);
+    setRoomNumber(room);
     setIndex(1); // Switch to Map
   };
 
