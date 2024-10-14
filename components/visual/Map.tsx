@@ -4,7 +4,7 @@ import WifiManager from "react-native-wifi-reborn";
 import ImageGallery from './ImageGallery';
 import NavigationAudioGuide from '../audio/NavigationAudioGuide';
 
-interface ImageItem {
+export interface ImageItem {
   url: string;
   description: string;
 }
@@ -122,7 +122,7 @@ const Map = ({ floorNumber, roomNumber }) => {
         <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
       </View>
       <ImageGallery images={images} />
-      <NavigationAudioGuide/>
+      <NavigationAudioGuide images={images}/>
     </SafeAreaView>
   );
 };

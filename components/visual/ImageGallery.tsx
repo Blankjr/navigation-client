@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import PagerView from 'react-native-pager-view';
 
 import { create } from 'zustand'
+import { ImageItem } from './Map';
 
 interface IGalleryStore {
     currentImageIndex: number
@@ -17,12 +18,8 @@ export const useGalleryStore = create<IGalleryStore>((set) => ({
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-interface ImageItem {
-  url: string;
-  description: string;
-}
 
-interface ImageGalleryProps {
+export interface ImageGalleryProps {
   images: ImageItem[];
 }
 

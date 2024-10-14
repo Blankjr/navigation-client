@@ -2,19 +2,19 @@
 
 import { View, StyleSheet } from 'react-native';
 import * as Speech from 'expo-speech';
-import { useGalleryStore } from '../visual/ImageGallery';
+import { ImageGalleryProps, useGalleryStore } from '../visual/ImageGallery';
 import { useCallback } from 'react';
 import { Button, IconButton } from 'react-native-paper';
 
-export default function App() {
+const NavigationAudioGuide: React.FC<ImageGalleryProps> = ({ images }) => {
     const imageIndex = useGalleryStore((state) => state.currentImageIndex)
     const speak = useCallback(() => {
-        const thingToSay = 'Laufe am grünen Schild vorbei';
+        const imageDescription = images[imageIndex].description;
         Speech.VoiceQuality.Enhanced;
         
         console.log(imageIndex);
         
-        Speech.speak(thingToSay, {language:"de-DE"});
+        Speech.speak(imageDescription, {language:"de-DE"});
     }, [imageIndex])
 
     return (
@@ -50,3 +50,6 @@ export default function App() {
         },
 
     });
+
+
+    export default NavigationAudioGuide;
