@@ -2,6 +2,7 @@ import * as React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid } from 'react-native';
 import WifiManager from "react-native-wifi-reborn";
 import ImageGallery from './ImageGallery';
+import NavigationAudioGuide from '../audio/NavigationAudioGuide';
 
 interface ImageItem {
   url: string;
@@ -90,23 +91,23 @@ const Map = ({ floorNumber, roomNumber }) => {
     const images: ImageItem[] = [
       {
         url: 'https://picsum.photos/seed/696/3000/2000',
-        description: 'A scenic view of a mountain landscape with a lake in the foreground'
+        description: 'Eine malerische Aussicht auf eine Berglandschaft mit einem See im Vordergrund'
       },
       {
         url: 'https://picsum.photos/seed/697/3000/2000',
-        description: 'A bustling city street with tall buildings and people walking'
+        description: 'Eine belebte Stadtstraße mit hohen Gebäuden und gehenden Menschen'
       },
       {
         url: 'https://picsum.photos/seed/698/3000/2000',
-        description: 'A close-up of a colorful flower with dewdrops on its petals'
+        description: 'Eine Nahaufnahme einer farbenfrohen Blume mit Tautropfen auf ihren Blütenblättern'
       },
       {
         url: 'https://picsum.photos/seed/699/3000/2000',
-        description: 'A serene beach scene with white sand and clear blue water'
+        description: 'Eine friedliche Strandszene mit weißem Sand und klarem blauen Wasser'
       },
       {
         url: 'https://picsum.photos/seed/700/3000/2000',
-        description: 'An aerial view of a dense forest with various shades of green'
+        description: 'Eine Luftaufnahme eines dichten Waldes mit verschiedenen Grüntönen'
       }
     ];
   
@@ -121,6 +122,7 @@ const Map = ({ floorNumber, roomNumber }) => {
         <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
       </View>
       <ImageGallery images={images} />
+      <NavigationAudioGuide/>
     </SafeAreaView>
   );
 };

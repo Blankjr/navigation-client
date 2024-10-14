@@ -1,7 +1,18 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Dimensions, Text, AccessibilityInfo } from 'react-native';
 import { Image } from 'expo-image';
 import PagerView from 'react-native-pager-view';
+
+import { create } from 'zustand'
+
+interface IGalleryStore {
+    currentImageIndex: number
+    updateCurrentImageIndex: (newIndex: number) => void
+}
+export const useGalleryStore = create<IGalleryStore>((set) => ({
+  currentImageIndex: 0,
+  updateCurrentImageIndex: (newIndex: number) => set({ currentImageIndex: newIndex}),
+}));
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -15,17 +26,21 @@ interface ImageGalleryProps {
   images: ImageItem[];
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
-  const [currentPage, setCurrentPage] = useState(0);
 
-  const onPageSelected = (e: { nativeEvent: { position: number } }) => {
-    const newPage = e.nativeEvent.position;
-    setCurrentPage(newPage);
-    
-    AccessibilityInfo.announceForAccessibility(
-      `Image ${newPage + 1} of ${images.length}. ${images[newPage].description}`
-    );
-  };
+
+const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const updateCurrentImageIndex = useGalleryStore(state => state.updateCurrentImageIndex);
+  
+    const onPageSelected = useCallback((e: { nativeEvent: { position: number } }) => {
+      const newPage = e.nativeEvent.position;
+      setCurrentPage(newPage);
+      updateCurrentImageIndex(newPage);
+      
+      AccessibilityInfo.announceForAccessibility(
+        `Image ${newPage + 1} of ${images.length}. ${images[newPage].description}`
+      );
+    }, [images, updateCurrentImageIndex]);
 
   return (
     <View style={styles.container}>
