@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, SegmentedButtons, TextInput } from 'react-native-paper';
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView, Keyboard } from 'react-native';
 
 const SelectDestination = ({ onSearch }) => {
   const [floorNumber, setFloorNumber] = React.useState('');
@@ -8,6 +8,7 @@ const SelectDestination = ({ onSearch }) => {
 
   const handleSearch = () => {
     onSearch(floorNumber, roomNumber);
+    Keyboard.dismiss();
   };
 
   return (
