@@ -1,9 +1,10 @@
 
 
-import { View, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import * as Speech from 'expo-speech';
 import { useGalleryStore } from '../visual/ImageGallery';
 import { useCallback } from 'react';
+import { Button, IconButton } from 'react-native-paper';
 
 export default function App() {
     const imageIndex = useGalleryStore((state) => state.currentImageIndex)
@@ -18,16 +19,34 @@ export default function App() {
 
     return (
         <View style={styles.container}>
-        <Button title="Press to hear some words" onPress={speak} />
+             <IconButton
+                style={styles.button} 
+                icon="speaker"
+                mode="contained" 
+                iconColor='#ce7276'
+                size={75}
+                onPress={speak}
+            />
+        
         </View>
     );
     }
 
     const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#ecf0f1',
-        padding: 8,
-    },
+        container: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#ecf0f1',
+            padding: 8,
+        },
+        button: {
+            borderRadius: 5,
+            width: 100,
+            height: 100,
+            borderColor: '#000000',
+            borderWidth: 2
+            
+        },
+
     });
