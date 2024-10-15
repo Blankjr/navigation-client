@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid } fr
 import WifiManager from "react-native-wifi-reborn";
 import ImageGallery from './ImageGallery';
 import NavigationAudioGuide from '../audio/NavigationAudioGuide';
+import WebViewer from './WebViewer';
+import { Button } from 'react-native-paper';
 
 export interface ImageItem {
   url: string;
@@ -11,6 +13,7 @@ export interface ImageItem {
 
 const Map = ({ floorNumber, roomNumber }) => {
   const [wifiInfo, setWifiInfo] = React.useState(null);
+  const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -112,20 +115,31 @@ const Map = ({ floorNumber, roomNumber }) => {
     ];
   
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Aktuelles Ziel:</Text>
-        <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
-      </View>
-      <View style={styles.middleContent}>
-        <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
-      </View>
-      <ImageGallery images={images} />
-      <NavigationAudioGuide images={images}/>
-    </SafeAreaView>
-  );
-};
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Aktuelles Ziel:</Text>
+          <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
+        </View>
+        {/* <View style={styles.middleContent}>
+          <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
+        </View> */}
+        <ImageGallery images={images} />
+        <NavigationAudioGuide images={images}/>
+        <Button 
+          icon="web" 
+          mode="contained" 
+          onPress={() => setIsWebViewVisible(true)}
+        >
+          Ziel Informationen
+        </Button>
+        <WebViewer 
+          isVisible={isWebViewVisible}
+          onClose={() => setIsWebViewVisible(false)}
+        />
+      </SafeAreaView>
+    );
+  };
 
 const styles = StyleSheet.create({
   container: {
