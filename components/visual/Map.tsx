@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid, ActivityIndicator } from 'react-native';
+import { useQuery } from 'react-query';
 import WifiManager from "react-native-wifi-reborn";
 import ImageGallery from './ImageGallery';
 import NavigationAudioGuide from '../audio/NavigationAudioGuide';
@@ -11,10 +12,29 @@ export interface ImageItem {
   description: string;
 }
 
+const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app';
+
+const fetchGuideData = async (floorNumber: string, roomNumber: string): Promise<ImageItem[]> => {
+  const response = await fetch(`${API_URL}/guide?floor=${floorNumber}&room=${roomNumber}`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
 const Map = ({ floorNumber, roomNumber }) => {
   const [wifiInfo, setWifiInfo] = React.useState(null);
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
 
+  const { data: images, isLoading, error, refetch } = useQuery<ImageItem[], Error>(
+    ['guideData', floorNumber, roomNumber],
+    () => fetchGuideData(floorNumber, roomNumber),
+    {
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      enabled: !!floorNumber && !!roomNumber, // Only run the query if floorNumber and roomNumber are provided
+    }
+  );
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -90,56 +110,49 @@ const Map = ({ floorNumber, roomNumber }) => {
     }
   };
 
-    // Sample array of image URLs
-    const images: ImageItem[] = [
-      {
-        url: 'https://picsum.photos/seed/696/3000/2000',
-        description: 'Eine malerische Aussicht auf eine Berglandschaft mit einem See im Vordergrund'
-      },
-      {
-        url: 'https://picsum.photos/seed/697/3000/2000',
-        description: 'Eine belebte Stadtstraße mit hohen Gebäuden und gehenden Menschen'
-      },
-      {
-        url: 'https://picsum.photos/seed/698/3000/2000',
-        description: 'Eine Nahaufnahme einer farbenfrohen Blume mit Tautropfen auf ihren Blütenblättern'
-      },
-      {
-        url: 'https://picsum.photos/seed/699/3000/2000',
-        description: 'Eine friedliche Strandszene mit weißem Sand und klarem blauen Wasser'
-      },
-      {
-        url: 'https://picsum.photos/seed/700/3000/2000',
-        description: 'Eine Luftaufnahme eines dichten Waldes mit verschiedenen Grüntönen'
-      }
-    ];
-  
-
+  if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Aktuelles Ziel:</Text>
-          <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
-        </View>
-        {/* <View style={styles.middleContent}>
-          <Text style={styles.wifiInfo}>WiFi-Informationen werden alle 5 Sekunden gescannt und in der Konsole protokolliert.</Text>
-        </View> */}
-        <ImageGallery images={images} />
-        <NavigationAudioGuide images={images}/>
-        <Button 
-          icon="web" 
-          mode="contained" 
-          onPress={() => setIsWebViewVisible(true)}
-        >
-          Ziel Informationen
-        </Button>
-        <WebViewer 
-          isVisible={isWebViewVisible}
-          onClose={() => setIsWebViewVisible(false)}
-        />
-      </SafeAreaView>
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
     );
-  };
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text>{error.message}</Text>
+        <Button onPress={() => refetch()}>Retry</Button>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Aktuelles Ziel:</Text>
+        <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
+      </View>
+      {images && (
+        <>
+          <ImageGallery images={images} />
+          <NavigationAudioGuide images={images}/>
+        </>
+      )}
+      <Button 
+        icon="web" 
+        mode="contained" 
+        onPress={() => setIsWebViewVisible(true)}
+      >
+        Ziel Informationen
+      </Button>
+      <WebViewer 
+        isVisible={isWebViewVisible}
+        onClose={() => setIsWebViewVisible(false)}
+      />
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -179,6 +192,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
     textAlign: 'center',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

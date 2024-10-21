@@ -19,7 +19,7 @@ const WebViewer: React.FC<WebViewerProps> = ({ isVisible, onClose }) => {
       <SafeAreaView style={styles.container}>
         <WebView
           style={styles.webview}
-          source={{ uri: 'https://medien.hs-duesseldorf.de/wojciechowski' }}
+          source={{ uri: 'https://responsivevoice.org/text-to-speech-sdk/text-to-speech-play-button/' }}
         />
         <View style={styles.footer}>
         <IconButton

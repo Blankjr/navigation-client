@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { DefaultTheme, PaperProvider } from "react-native-paper";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 const customTheme = {
   ...DefaultTheme,
@@ -13,20 +14,24 @@ const customTheme = {
   },
 };
 
+const queryClient = new QueryClient();
+
 export default function RootLayout() {
   return (
-    <PaperProvider theme={customTheme}>
-      <StatusBar style="dark" backgroundColor="rgba(0,0,0,0.1)" />
-      <SafeAreaView style={{ flex: 1, backgroundColor: customTheme.colors.background }}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: customTheme.colors.background },
-          }}
-        >
-          <Stack.Screen name="index" />
-        </Stack>
-      </SafeAreaView>
-    </PaperProvider>
+    <QueryClientProvider client={queryClient}>
+      <PaperProvider theme={customTheme}>
+        <StatusBar style="dark" backgroundColor="rgba(0,0,0,0.1)" />
+        <SafeAreaView style={{ flex: 1, backgroundColor: customTheme.colors.background }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: customTheme.colors.background },
+            }}
+          >
+            <Stack.Screen name="index" />
+          </Stack>
+        </SafeAreaView>
+      </PaperProvider>
+    </QueryClientProvider>
   );
 }
