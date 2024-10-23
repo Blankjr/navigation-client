@@ -23,3 +23,43 @@ Ensuring sufficient color contrast throughout your app.
 Providing text alternatives for all non-text content.
 Making all functionality available from a keyboard (important for users who rely on switch control or voice control).
 Testing your app with actual screen reader users to get feedback on the user experience.
+
+
+
+
+
+
+
+
+
+
+
+## Theme
+
+This accessible theme includes:
+
+Color Contrast: All colors meet WCAG 2.1 AA standards for contrast ratios
+
+Text colors have at least 4.5:1 contrast ratio with their backgrounds
+Interactive elements have at least 3:1 contrast ratio
+
+
+Typography:
+
+Clear hierarchy with consistent line heights
+Adequate letter spacing for improved readability
+Minimum font size of 11px for legibility
+Proper line height ratios
+
+
+Spacing:
+
+Consistent spacing scale
+Adequate touch targets (minimum 44x44 pixels)
+
+
+Interactive Elements:
+
+Clear focus states
+Distinct colors for interactive elements
+Error states are clearly visible
