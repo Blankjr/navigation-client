@@ -3,10 +3,12 @@ import { View, StyleSheet } from 'react-native';
 import * as Speech from 'expo-speech';
 import { ImageGalleryProps, useGalleryStore } from '../visual/ImageGallery';
 import { IconButton } from 'react-native-paper';
+import { useAudioStore } from '../../stores/useAudioStore';
 
 const NavigationAudioGuide: React.FC<ImageGalleryProps> = ({ images }) => {
     const imageIndex = useGalleryStore((state) => state.currentImageIndex);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const speechRate = useAudioStore((state) => state.speechRate);
 
     useEffect(() => {
         return () => {
@@ -27,6 +29,7 @@ const NavigationAudioGuide: React.FC<ImageGalleryProps> = ({ images }) => {
             try {
                 await Speech.speak(imageDescription, {
                     language: "de-DE",
+                    rate: speechRate,
                     onDone: () => setIsSpeaking(false),
                     onError: () => setIsSpeaking(false)
                 });
