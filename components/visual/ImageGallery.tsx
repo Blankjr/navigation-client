@@ -2,15 +2,15 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, Dimensions, Text, AccessibilityInfo } from 'react-native';
 import { Image } from 'expo-image';
 import PagerView from 'react-native-pager-view';
-
-import { create } from 'zustand'
+import { create } from 'zustand';
 import { ImageItem } from './Map';
 
 interface IGalleryStore {
     currentImageIndex: number
     updateCurrentImageIndex: (newIndex: number) => void
 }
-export const useGalleryStore = create<IGalleryStore>((set) => ({
+
+export const useGalleryStore = create<IGalleryStore>()((set) => ({
   currentImageIndex: 0,
   updateCurrentImageIndex: (newIndex: number) => set({ currentImageIndex: newIndex}),
 }));
@@ -18,12 +18,9 @@ export const useGalleryStore = create<IGalleryStore>((set) => ({
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-
 export interface ImageGalleryProps {
   images: ImageItem[];
 }
-
-
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -34,74 +31,91 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
       setCurrentPage(newPage);
       updateCurrentImageIndex(newPage);
       
-      AccessibilityInfo.announceForAccessibility(
-        `Image ${newPage + 1} of ${images.length}. ${images[newPage].description}`
-      );
+      // Safety check for valid image and description
+      if (images && images[newPage] && images[newPage].description) {
+        AccessibilityInfo.announceForAccessibility(
+          `Image ${newPage + 1} of ${images.length}. ${images[newPage].description}`
+        );
+      } else {
+        // Fallback announcement if description is missing
+        AccessibilityInfo.announceForAccessibility(
+          `Image ${newPage + 1} of ${images.length}`
+        );
+      }
     }, [images, updateCurrentImageIndex]);
 
-  return (
-    <View style={styles.container}>
-      <PagerView 
-        style={styles.pagerView} 
-        initialPage={0}
-        onPageSelected={onPageSelected}
-        accessible={true}
-        accessibilityLabel={`Image gallery with ${images.length} images`}
-        accessibilityHint="Swipe left or right to view different images"
-      >
-        {images.map((image, index) => (
-          <View 
-            key={index} 
-            style={styles.page}
-            accessible={true}
-            accessibilityLabel={`Image ${index + 1} of ${images.length}`}
-            accessibilityHint={image.description}
-          >
-            <Image
-              style={styles.image}
-              source={image.url}
-              placeholder={blurhash}
-              contentFit="cover"
-              transition={1000}
-              accessible={true}
-              accessibilityLabel={image.description}
-            />
-          </View>
-        ))}
-      </PagerView>
-      <View 
-        style={styles.indicatorContainer}
-        accessible={true}
-        accessibilityLabel={`Image ${currentPage + 1} of ${images.length}`}
-        accessibilityHint="Shows current image position"
-      >
-        <Text style={styles.pageText}>
-          {currentPage + 1} / {images.length}
-        </Text>
-        <View style={styles.dotContainer}>
-          {images.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.dot,
-                index === currentPage ? styles.activeDot : styles.inactiveDot
-              ]}
-            />
-          ))}
+    // Safety check for empty images array
+    if (!images || images.length === 0) {
+      return (
+        <View style={styles.container}>
+          <Text>No images available</Text>
         </View>
-      </View>
-      {currentPage === 0 && (
-        <Text 
-          style={styles.swipeHint}
+      );
+    }
+
+    return (
+      <View style={styles.container}>
+        <PagerView 
+          style={styles.pagerView} 
+          initialPage={0}
+          onPageSelected={onPageSelected}
           accessible={true}
-          accessibilityLabel="Swipe hint"
-          accessibilityHint="Swipe right to view more images"
+          accessibilityLabel={`Image gallery with ${images.length} images`}
+          accessibilityHint="Swipe left or right to view different images"
         >
-          Swipe für mehr Bilder ➡️
-        </Text>
-      )}
-    </View>
-  );
+          {images.map((image, index) => (
+            <View 
+              key={index} 
+              style={styles.page}
+              accessible={true}
+              accessibilityLabel={`Image ${index + 1} of ${images.length}`}
+              accessibilityHint={image?.description || 'No description available'}
+            >
+              <Image
+                style={styles.image}
+                source={image.url}
+                placeholder={blurhash}
+                contentFit="cover"
+                transition={1000}
+                accessible={true}
+                accessibilityLabel={image?.description || 'No description available'}
+              />
+            </View>
+          ))}
+        </PagerView>
+        <View 
+          style={styles.indicatorContainer}
+          accessible={true}
+          accessibilityLabel={`Image ${currentPage + 1} of ${images.length}`}
+          accessibilityHint="Shows current image position"
+        >
+          <Text style={styles.pageText}>
+            {currentPage + 1} / {images.length}
+          </Text>
+          <View style={styles.dotContainer}>
+            {images.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  index === currentPage ? styles.activeDot : styles.inactiveDot
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+        {currentPage === 0 && (
+          <Text 
+            style={styles.swipeHint}
+            accessible={true}
+            accessibilityLabel="Swipe hint"
+            accessibilityHint="Swipe right to view more images"
+          >
+            Swipe für mehr Bilder ➡️
+          </Text>
+        )}
+      </View>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -166,6 +180,6 @@ const styles = StyleSheet.create({
       textShadowOffset: {width: -1, height: 1},
       textShadowRadius: 10,
     },
-  });
+});
 
 export default ImageGallery;
