@@ -12,10 +12,35 @@ export interface ImageItem {
   description: string;
 }
 
+interface RoutePoint {
+  x: number;
+  y: number;
+  waypointId?: string;
+}
+
+interface Waypoint extends ImageItem {
+  id: string;
+}
+
+interface NavigationResponse {
+  start: {
+    floor: number;
+    room: number;
+  };
+  destination: {
+    floor: number;
+    room: number;
+  };
+  route: RoutePoint[];
+  waypoints: Waypoint[];
+}
+
 const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app';
 
-const fetchGuideData = async (floorNumber: string, roomNumber: string): Promise<ImageItem[]> => {
-  const response = await fetch(`${API_URL}/guide?floor=${floorNumber}&room=${roomNumber}`);
+const fetchGuideData = async (startFloor: string, startRoom: string, destFloor: string, destRoom: string): Promise<NavigationResponse> => {
+  const response = await fetch(
+    `${API_URL}/guide?start_floor=${startFloor}&start_room=${startRoom}&destination_floor=${destFloor}&destination_room=${destRoom}`
+  );
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -26,13 +51,15 @@ const Map = ({ floorNumber, roomNumber }) => {
   const [wifiInfo, setWifiInfo] = React.useState(null);
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
 
-  const { data: images, isLoading, error, refetch } = useQuery<ImageItem[], Error>(
+  // For now, we'll use the same floor/room numbers for both start and destination
+  // You might want to add start location as props or determine it another way
+  const { data, isLoading, error, refetch } = useQuery<NavigationResponse, Error>(
     ['guideData', floorNumber, roomNumber],
-    () => fetchGuideData(floorNumber, roomNumber),
+    () => fetchGuideData('1', '1', floorNumber, roomNumber), // Example start location
     {
       retry: 3,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      enabled: !!floorNumber && !!roomNumber, // Only run the query if floorNumber and roomNumber are provided
+      enabled: !!floorNumber && !!roomNumber,
     }
   );
   const requestLocationPermission = async () => {
@@ -127,16 +154,28 @@ const Map = ({ floorNumber, roomNumber }) => {
     );
   }
 
+  // Get only waypoints that are referenced in the route
+  const relevantWaypoints = data?.waypoints.filter(waypoint => 
+    data.route.some(point => point.waypointId === waypoint.id)
+  ) || [];
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Aktuelles Ziel:</Text>
-        <Text style={styles.roomInfo}>{getFloorLabel(floorNumber)}, Raum: {roomNumber}</Text>
+        <Text style={styles.roomInfo}>
+          {getFloorLabel(data?.destination.floor.toString() || '')}, 
+          Raum: {data?.destination.room}
+        </Text>
+        <Text style={styles.startInfo}>
+          Start: {getFloorLabel(data?.start.floor.toString() || '')}, 
+          Raum: {data?.start.room}
+        </Text>
       </View>
-      {images && (
+      {data && (
         <>
-          <ImageGallery images={images} />
-          <NavigationAudioGuide images={images}/>
+          <ImageGallery images={relevantWaypoints} />
+          <NavigationAudioGuide images={relevantWaypoints}/>
         </>
       )}
       <Button 
@@ -153,6 +192,7 @@ const Map = ({ floorNumber, roomNumber }) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -197,6 +237,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  startInfo: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 5,
   },
 });
 
