@@ -35,6 +35,17 @@ export default function Index() {
       navigationState={{ index, routes }}
       onIndexChange={setIndex}
       renderScene={renderScene}
+      activeColor="#0052CC" // Darker blue for better visibility
+      activeIndicatorStyle={{
+        backgroundColor: '#FFFFFF',
+        borderWidth: 2,
+        borderColor: '#0052CC', // Matching border color for consistency
+      }}
+      barStyle={{
+        backgroundColor: '#f5f5f5',
+        borderTopWidth: 1,
+        borderTopColor: '#e0e0e0',
+      }}
     />
   );
 }
