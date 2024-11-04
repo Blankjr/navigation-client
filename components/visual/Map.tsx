@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid, ActivityIndicator } from 'react-native';
 import { useQuery } from 'react-query';
-import WifiManager from "react-native-wifi-reborn";
+import TetheringManager, { Network, Event, TetheringError } from '@react-native-tethering/wifi';
 import ImageGallery from './ImageGallery';
 import NavigationAudioGuide from '../audio/NavigationAudioGuide';
 import WebViewer from './WebViewer';
@@ -50,6 +50,10 @@ const fetchGuideData = async (startFloor: string, startRoom: string, destFloor: 
 const Map = ({ floorNumber, roomNumber }) => {
   const [wifiInfo, setWifiInfo] = React.useState(null);
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
+  const [lastScanTime, setLastScanTime] = React.useState(0);
+  const [retryCount, setRetryCount] = React.useState(0);
+  const MAX_RETRIES = 3;
+  const MIN_SCAN_INTERVAL = 30000; // 30 seconds minimum between scans
 
   // For now, we'll use the same floor/room numbers for both start and destination
   // You might want to add start location as props or determine it another way
@@ -65,26 +69,41 @@ const Map = ({ floorNumber, roomNumber }) => {
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
-        const granted = await PermissionsAndroid.request(
+        // Request permissions one at a time
+        const fineLocation = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: "Location permission is required for WiFi connections",
-            message:
-              "This app needs location permission as this is required " +
-              "to scan for wifi networks.",
+            title: "Location Permission",
+            message: "This app needs location permission to scan WiFi networks",
             buttonNegative: "DENY",
             buttonPositive: "ALLOW"
           }
         );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("You can use the WiFi");
+
+        const coarseLocation = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+          {
+            title: "Location Permission",
+            message: "This app needs location permission to scan WiFi networks",
+            buttonNegative: "DENY",
+            buttonPositive: "ALLOW"
+          }
+        );
+        
+        const isGranted = fineLocation === PermissionsAndroid.RESULTS.GRANTED &&
+                         coarseLocation === PermissionsAndroid.RESULTS.GRANTED;
+        
+        console.log("Permission status:", { fineLocation, coarseLocation });
+        
+        if (isGranted) {
+          console.log("WiFi permissions granted");
           return true;
         } else {
           console.log("Location permission denied");
           return false;
         }
       } catch (err) {
-        console.warn(err);
+        console.warn("Permission request error:", err);
         return false;
       }
     }
@@ -92,39 +111,98 @@ const Map = ({ floorNumber, roomNumber }) => {
   };
 
   const scanWifi = async () => {
+    const currentTime = Date.now();
+    if (currentTime - lastScanTime < MIN_SCAN_INTERVAL) {
+      console.log("Skipping scan due to rate limiting", {
+        timeSinceLastScan: currentTime - lastScanTime,
+        minInterval: MIN_SCAN_INTERVAL
+      });
+      return;
+    }
+
     try {
       const permissionGranted = await requestLocationPermission();
       if (!permissionGranted) return;
 
-      const ssid = await WifiManager.getCurrentWifiSSID();
-      const bssid = await WifiManager.getBSSID();
-      const strength = await WifiManager.getCurrentSignalStrength();
-      const frequency = await WifiManager.getFrequency();
-      const ip = await WifiManager.getIP();
+      // Check if WiFi is enabled
+      const isEnabled = await TetheringManager.isWifiEnabled();
+      if (!isEnabled) {
+        console.log("WiFi is not enabled, enabling...");
+        await TetheringManager.setWifiEnabled();
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for WiFi to initialize
+      }
 
-      const newWifiInfo = {
-        ssid,
-        bssid,
-        strength,
-        frequency,
-        ip
-      };
+      try {
+        console.log("Starting WiFi scan...");
+        const networks = await TetheringManager.getWifiNetworks(true);
+        console.log(`Successfully scanned ${networks.length} networks`);
+        
+        // Reset retry count on successful scan
+        setRetryCount(0);
+        setLastScanTime(currentTime);
 
-      setWifiInfo(newWifiInfo);
-      console.log("WiFi Info:", newWifiInfo);
+        // Print network information
+        console.log("\n=== Available Networks ===");
+        networks.forEach((network, index) => {
+          console.log(`
+Network ${index + 1}:
+  SSID: ${network.ssid}
+  Signal: ${network.level} dBm
+  Frequency: ${network.frequency} MHz
+  Security: ${network.capabilities}
+  BSSID: ${network.bssid}
+          `);
+        });
+
+        // Update connected network info
+        const isConnected = await TetheringManager.isDeviceAlreadyConnected();
+        if (isConnected) {
+          const ip = await TetheringManager.getDeviceIP();
+          const connectedNetwork = networks[0];
+          
+          setWifiInfo({
+            ssid: connectedNetwork?.ssid || '',
+            bssid: connectedNetwork?.bssid || '',
+            strength: connectedNetwork?.level || 0,
+            frequency: connectedNetwork?.frequency || 0,
+            ip
+          });
+        }
+
+      } catch (scanError) {
+        console.warn("Scan error:", scanError);
+        
+        // Implement retry logic
+        if (retryCount < MAX_RETRIES) {
+          const nextRetry = retryCount + 1;
+          setRetryCount(nextRetry);
+          console.log(`Retry attempt ${nextRetry}/${MAX_RETRIES} in 5 seconds...`);
+          setTimeout(() => scanWifi(), 5000);
+        } else {
+          console.log("Max retries reached, waiting for next scheduled scan");
+          setRetryCount(0);
+        }
+      }
     } catch (error) {
-      console.error('Error scanning WiFi:', error);
+      console.error('Unexpected error:', error);
     }
   };
 
   React.useEffect(() => {
-    scanWifi(); // Initial scan
+    // Initial scan with delay
+    const initialScanTimeout = setTimeout(() => {
+      scanWifi();
+    }, 2000);
 
+    // Set up periodic scanning with a longer interval
     const intervalId = setInterval(() => {
       scanWifi();
-    }, 5000); // Scan every 5 seconds
+    }, MIN_SCAN_INTERVAL);
 
-    return () => clearInterval(intervalId); // Clean up on component unmount
+    return () => {
+      clearTimeout(initialScanTimeout);
+      clearInterval(intervalId);
+    };
   }, []);
 
   const getFloorLabel = (floor) => {
