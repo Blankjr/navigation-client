@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { Button, SegmentedButtons, TextInput } from 'react-native-paper';
 import { StyleSheet, SafeAreaView, Keyboard } from 'react-native';
+import VoiceSelector from './VoiceSelector';
+
+const handleLocationSelect = (location) => {
+  console.log('Selected location:', location);
+  // Handle the selected location
+};
 
 const SelectDestination = ({ onSearch }) => {
   const [floorNumber, setFloorNumber] = React.useState('');
@@ -39,6 +45,7 @@ const SelectDestination = ({ onSearch }) => {
       >
         Ziel wählen
       </Button>
+      <VoiceSelector onLocationSelect={handleLocationSelect} />
     </SafeAreaView>
   );
 };
