@@ -90,7 +90,7 @@ const Map = ({ floorNumber, roomNumber }) => {
     'positionData',
     fetchPositionData,
     {
-      refetchInterval: 30000, // Refetch every 30 seconds
+      refetchInterval: 10000, // Refetch every 10 seconds
       onSuccess: (data) => {
         setCurrentGridSquare(data.gridSquare);
       },
@@ -271,10 +271,6 @@ Network ${index + 1}:
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.locationHeader}>
-          <View style={styles.currentPosition}>
-            <Text style={styles.subtitle}>Aktuelle Position:</Text>
-            <Text style={styles.gridSquare}>{currentGridSquare || 'Wird ermittelt...'}</Text>
-          </View>
           <View style={styles.destinationInfo}>
             <Text style={styles.title}>Aktuelles Ziel:</Text>
             <Text style={styles.roomInfo}>
@@ -285,6 +281,10 @@ Network ${index + 1}:
               Start: {getFloorLabel(data?.start.floor.toString() || '')}, 
               Raum: {data?.start.room}
             </Text>
+          </View>
+          <View style={styles.currentPosition}>
+            <Text style={styles.subtitle}>Aktuelle Position:</Text>
+            <Text style={styles.gridSquare}>{currentGridSquare || 'Wird ermittelt...'}</Text>
           </View>
         </View>
       </View>
