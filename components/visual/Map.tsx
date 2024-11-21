@@ -90,7 +90,7 @@ const Map = ({ floorNumber, roomNumber }) => {
     'positionData',
     fetchPositionData,
     {
-      refetchInterval: 10000, // Refetch every 10 seconds
+      refetchInterval: 5000, // Refetch every 5 seconds
       onSuccess: (data) => {
         setCurrentGridSquare(data.gridSquare);
       },
