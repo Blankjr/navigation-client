@@ -35,14 +35,33 @@ interface NavigationResponse {
   waypoints: Waypoint[];
 }
 
-const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app';
+interface PositionResponse {
+  position: {
+    x: number;
+    y: number;
+    floor: string;
+    timestamp: number;
+  };
+  gridSquare: string;
+  timestamp: number;
+}
+
+const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app/';
 
 const fetchGuideData = async (startFloor: string, startRoom: string, destFloor: string, destRoom: string): Promise<NavigationResponse> => {
   const response = await fetch(
-    `${API_URL}/guide?start_floor=${startFloor}&start_room=${startRoom}&destination_floor=${destFloor}&destination_room=${destRoom}`
+    `${API_URL}guide?start_floor=${startFloor}&start_room=${startRoom}&destination_floor=${destFloor}&destination_room=${destRoom}`
   );
   if (!response.ok) {
     throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+const fetchPositionData = async (): Promise<PositionResponse> => {
+  const response = await fetch(`${API_URL}simulatedPosition/gridSquare/`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch position data');
   }
   return response.json();
 };
@@ -52,11 +71,11 @@ const Map = ({ floorNumber, roomNumber }) => {
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
   const [lastScanTime, setLastScanTime] = React.useState(0);
   const [retryCount, setRetryCount] = React.useState(0);
+  const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
   const MAX_RETRIES = 3;
   const MIN_SCAN_INTERVAL = 30000; // 30 seconds minimum between scans
 
   // For now, we'll use the same floor/room numbers for both start and destination
-  // You might want to add start location as props or determine it another way
   const { data, isLoading, error, refetch } = useQuery<NavigationResponse, Error>(
     ['guideData', floorNumber, roomNumber],
     () => fetchGuideData('1', '1', floorNumber, roomNumber), // Example start location
@@ -64,6 +83,17 @@ const Map = ({ floorNumber, roomNumber }) => {
       retry: 3,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       enabled: !!floorNumber && !!roomNumber,
+    }
+  );
+
+  const { data: positionData } = useQuery<PositionResponse, Error>(
+    'positionData',
+    fetchPositionData,
+    {
+      refetchInterval: 30000, // Refetch every 30 seconds
+      onSuccess: (data) => {
+        setCurrentGridSquare(data.gridSquare);
+      },
     }
   );
   const requestLocationPermission = async () => {
@@ -240,15 +270,23 @@ Network ${index + 1}:
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Aktuelles Ziel:</Text>
-        <Text style={styles.roomInfo}>
-          {getFloorLabel(data?.destination.floor.toString() || '')}, 
-          Raum: {data?.destination.room}
-        </Text>
-        <Text style={styles.startInfo}>
-          Start: {getFloorLabel(data?.start.floor.toString() || '')}, 
-          Raum: {data?.start.room}
-        </Text>
+        <View style={styles.locationHeader}>
+          <View style={styles.currentPosition}>
+            <Text style={styles.subtitle}>Aktuelle Position:</Text>
+            <Text style={styles.gridSquare}>{currentGridSquare || 'Wird ermittelt...'}</Text>
+          </View>
+          <View style={styles.destinationInfo}>
+            <Text style={styles.title}>Aktuelles Ziel:</Text>
+            <Text style={styles.roomInfo}>
+              {getFloorLabel(data?.destination.floor.toString() || '')}, 
+              Raum: {data?.destination.room}
+            </Text>
+            <Text style={styles.startInfo}>
+              Start: {getFloorLabel(data?.start.floor.toString() || '')}, 
+              Raum: {data?.start.room}
+            </Text>
+          </View>
+        </View>
       </View>
       {data && (
         <>
@@ -320,6 +358,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginTop: 5,
+  },
+
+  //currentLocation
+  locationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  currentPosition: {
+    flex: 1,
+    marginRight: 16,
+  },
+  destinationInfo: {
+    flex: 2,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  gridSquare: {
+    fontSize: 18,
+    color: '#444',
   },
 });
 
