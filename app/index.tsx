@@ -6,8 +6,7 @@ import Settings from '@/components/settings/Settings';
 
 export default function Index() {
   const [index, setIndex] = React.useState(0);
-  const [floorNumber, setFloorNumber] = React.useState('');
-  const [roomNumber, setRoomNumber] = React.useState('');
+  const [destinationRoom, setDestinationRoom] = React.useState('');
 
   const routes = [
     { key: 'selectDestination', title: 'Ziel wählen', unfocusedIcon: 'arrow-decision-outline', focusedIcon: 'arrow-decision' },
@@ -15,9 +14,8 @@ export default function Index() {
     { key: 'settings', title: 'Einstellungen', unfocusedIcon: 'cog-outline', focusedIcon: 'cog' },
   ];
 
-  const handleSearch = (floor, room) => {
-    setFloorNumber(floor);
-    setRoomNumber(room);
+  const handleSearch = (destination: string) => {
+    setDestinationRoom(destination);
     setIndex(1); // Switch to Map
   };
 
@@ -26,7 +24,7 @@ export default function Index() {
       case 'selectDestination':
         return <SelectDestination onSearch={handleSearch} />;
       case 'map':
-        return <Map floorNumber={floorNumber} roomNumber={roomNumber} />;
+        return <Map destinationRoom={destinationRoom} />;
       case 'settings':
         return <Settings />;
       default:

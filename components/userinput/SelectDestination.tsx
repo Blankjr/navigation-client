@@ -1,51 +1,51 @@
 import * as React from 'react';
-import { Button, SegmentedButtons, TextInput } from 'react-native-paper';
-import { StyleSheet, SafeAreaView, Keyboard } from 'react-native';
+import { Button } from 'react-native-paper';
+import { StyleSheet, SafeAreaView, View, Text } from 'react-native';
 import VoiceSelector from './VoiceSelector';
+import { Location } from '../../data/locations';
 
-const handleLocationSelect = (location) => {
-  console.log('Selected location:', location);
-  // Handle the selected location
-};
+interface SelectDestinationProps {
+  onSearch: (destinationRoom: string) => void;
+}
 
-const SelectDestination = ({ onSearch }) => {
-  const [floorNumber, setFloorNumber] = React.useState('');
-  const [roomNumber, setRoomNumber] = React.useState('');
+const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
+  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
 
-  const handleSearch = () => {
-    onSearch(floorNumber, roomNumber);
-    Keyboard.dismiss();
+  const handleLocationSelect = (location: Location) => {
+    setSelectedLocation(location);
+    
+    // If it's a room-based location (like a professor's office), use the room number
+    // Otherwise use the location name (like 'lernraum', 'fachschaft', etc.)
+    const destination = location.room || location.name.toLowerCase();
+    onSearch(destination);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <SegmentedButtons
-        value={floorNumber}
-        onValueChange={setFloorNumber}
-        buttons={[
-          { value: '0', label: 'EG' },
-          { value: '1', label: '1 OG' },
-          { value: '2', label: '2 OG' },
-          { value: '3', label: '3 OG' },
-        ]}
-        style={styles.segmentedButtons}
-      />
-      <TextInput
-        placeholder={'Raum-Nummer'}
-        keyboardType="numeric"
-        mode='outlined'
-        style={styles.roomInput}
-        value={roomNumber}
-        onChangeText={setRoomNumber}
-      />
-      <Button
-        icon="airplane-search"
-        mode="contained"
-        onPress={handleSearch}
-      >
-        Ziel wählen
-      </Button>
-      <VoiceSelector onLocationSelect={handleLocationSelect} />
+      <View style={styles.selectionArea}>
+        {selectedLocation && (
+          <View style={styles.selectedLocation}>
+            <Text style={styles.selectedTitle}>Selected Destination:</Text>
+            <Text style={styles.selectedName}>{selectedLocation.name}</Text>
+            {selectedLocation.room && (
+              <Text style={styles.selectedRoom}>Room: {selectedLocation.room}</Text>
+            )}
+          </View>
+        )}
+        
+        <VoiceSelector onLocationSelect={handleLocationSelect} />
+      </View>
+
+      {selectedLocation && (
+        <Button
+          icon="map-marker-radius"
+          mode="contained"
+          onPress={() => handleLocationSelect(selectedLocation)}
+          style={styles.confirmButton}
+        >
+          Navigate to Destination
+        </Button>
+      )}
     </SafeAreaView>
   );
 };
@@ -53,15 +53,34 @@ const SelectDestination = ({ onSearch }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
   },
-  segmentedButtons: {
+  selectionArea: {
+    flex: 1,
+  },
+  selectedLocation: {
+    backgroundColor: '#f0f0f0',
+    padding: 15,
+    borderRadius: 8,
     marginBottom: 20,
   },
-  roomInput: {
-    width: '100%',
+  selectedTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#666',
+  },
+  selectedName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  selectedRoom: {
+    fontSize: 16,
+    color: '#333',
+    marginTop: 5,
+  },
+  confirmButton: {
+    marginTop: 20,
     marginBottom: 20,
   },
 });
