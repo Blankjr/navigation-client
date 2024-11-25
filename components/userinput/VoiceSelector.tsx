@@ -211,7 +211,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
         onPress={isListening ? stopListening : startListening}
       >
         <Text style={styles.buttonText}>
-          {isListening ? 'Stop Listening' : 'Start Voice Search'}
+          {isListening ? 'Stop' : 'Sprachsuche'}
         </Text>
       </TouchableOpacity>
 
