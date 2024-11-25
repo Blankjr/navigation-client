@@ -5,6 +5,7 @@ import ImageGallery from './ImageGallery';
 import NavigationAudioGuide from '../audio/NavigationAudioGuide';
 import WebViewer from './WebViewer';
 import { Button } from 'react-native-paper';
+import * as Speech from 'expo-speech';
 
 interface MapProps {
   destinationRoom: string; // This can be either a room number or a location name
@@ -13,10 +14,13 @@ interface MapProps {
 const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app/';
 
 const fetchGuideData = async (startGridSquare: string, destinationRoom: string) => {
+  destinationRoom = destinationRoom.replace(/\s+/g, '-');
   const response = await fetch(
     `${API_URL}guide?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`
   );
   if (!response.ok) {
+    console.log(`${API_URL}guide?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`);
+    
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -30,7 +34,27 @@ const fetchPositionData = async () => {
   return response.json();
 };
 
+const formatRoomForSpeech = (room: string): string => {
+  if (/^\d/.test(room)) {
+    const cleaned = room.replace(/[\s.]/g, '');
+    return cleaned.split('').join(' ')
+      .replace(/^0+/, '')
+      .replace(/(\d+)\s?[A-Za-z]$/, '$1 $2');
+  }
+  return room;
+};
+
+
 const Map: React.FC<MapProps> = ({ destinationRoom }) => {
+  React.useEffect(() => {
+    if (destinationRoom) {
+      const spokenRoom = formatRoomForSpeech(destinationRoom);
+      Speech.speak(`Navigation zum Raum: ${spokenRoom}`, {
+      language: 'de-DE',
+      rate: 0.9
+    });
+    }
+  }, [destinationRoom]);
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
 
@@ -78,19 +102,25 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
     guideData.route.some(point => point.waypointId === waypoint.id)
   ) || [];
 
+  let isSpeaking = false;
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <View style={styles.locationHeader}>
-          <View style={styles.destinationInfo}>
-            <Text style={styles.title}>Destination:</Text>
-            <Text style={styles.roomInfo}>
-              {destinationRoom}
-            </Text>
-          </View>
-          <View style={styles.currentPosition}>
-            <Text style={styles.subtitle}>Current Position:</Text>
-            <Text style={styles.gridSquare}>{currentGridSquare || 'Determining...'}</Text>
+        <View style={styles.DestinationHeader}>
+          <View style={styles.destinationInfo}
+          accessibilityRole="button"
+          onTouchEnd={async () => {
+            if (!isSpeaking) {
+              isSpeaking = true;
+              await Speech.speak(`Navigation zum Ziel: ${formatRoomForSpeech(destinationRoom)}`, {
+                language: 'de-DE',
+                rate: 1,
+                onDone: () => { isSpeaking = false }
+              });
+            }
+          }}>
+            <Button icon="target" contentStyle={{height: 80, alignItems: 'center'}}
+    labelStyle={{fontSize: 40, fontWeight: 'bold', lineHeight: 80, color: 'black'}}>{destinationRoom}</Button>
           </View>
         </View>
       </View>
@@ -102,12 +132,17 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
         </>
       )}
 
+<View style={styles.currentPosition}>
+            <Text style={styles.subtitle}>Position:</Text>
+            <Text style={styles.gridSquare}>{currentGridSquare || 'Determining...'}</Text>
+          </View>
+
       <Button 
         icon="web" 
         mode="contained" 
         onPress={() => setIsWebViewVisible(true)}
       >
-        Destination Information
+        Ziel Info
       </Button>
 
       <WebViewer 
@@ -145,12 +180,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 18,
+    fontSize: 40,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   roomInfo: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
   },
   wifiInfo: {
@@ -163,21 +198,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  startInfo: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 5,
-  },
-
-  //currentLocation
-  locationHeader: {
+  DestinationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   currentPosition: {
-    flex: 1,
-    marginRight: 16,
+    marginLeft: 120
   },
   destinationInfo: {
     flex: 2,

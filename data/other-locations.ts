@@ -38,6 +38,20 @@ export const locations = [
       aliases: ['pc raum', 'computerraum', 'pc labor']
     },
     {
+      id: '6',
+      name: 'Professor Asal',
+      type: 'person',
+      room: '04.3.009',
+      aliases: ['professor isolde asal', 'frau asal', 'professorin asal']
+    },
+    {
+      id: '7',
+      name: 'Professor Becker-Schweitzer',
+      type: 'person',
+      room: '05.E.057',
+      aliases: ['professor jörg becker schweitzer', 'becker schweitzer', 'professor becker']
+    },
+    {
       id: '8',
       name: 'Professor Bonse',
       type: 'person',
@@ -50,6 +64,13 @@ export const locations = [
       type: 'person',
       room: '04.2.010',
       aliases: ['professor markus dahm', 'herr dahm', 'dahm']
+    },
+    {
+      id: '10',
+      name: 'Professor Dederichs',
+      type: 'person',
+      room: '04.3.007',
+      aliases: ['professor stefanie dederichs', 'professorin dederichs', 'frau dederichs']
     },
     {
       id: '11',
@@ -73,6 +94,20 @@ export const locations = [
       aliases: ['professor alina huldtgren', 'professorin huldtgren', 'frau huldtgren']
     },
     {
+      id: '14',
+      name: 'Professor Leckschat',
+      type: 'person',
+      room: '05.E.059',
+      aliases: ['professor dieter leckschat', 'herr leckschat', 'leckschat']
+    },
+    {
+      id: '15',
+      name: 'Professor Marmann',
+      type: 'person',
+      room: '04.3.003',
+      aliases: ['professor michael marmann', 'herr marmann', 'marmann']
+    },
+    {
       id: '16',
       name: 'Professor Mostafawy',
       type: 'person',
@@ -92,6 +127,13 @@ export const locations = [
       type: 'person',
       room: '04.2.005',
       aliases: ['professor gabriele schwab trapp', 'professorin schwab trapp', 'frau schwab trapp']
+    },
+    {
+      id: '19',
+      name: 'Professor Steffens',
+      type: 'person',
+      room: '05.E.061',
+      aliases: ['professor jochen steffens', 'herr steffens', 'steffens']
     },
     {
       id: '20',

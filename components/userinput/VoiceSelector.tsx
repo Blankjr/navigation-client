@@ -222,11 +222,11 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
       {matchedLocation && (
         <View style={styles.resultContainer}>
           <Text style={styles.resultText}>
-            Found: {matchedLocation.name} 
+            gefunden: {matchedLocation.name} 
             {matchedLocation.room ? ` (Room ${matchedLocation.room})` : ` (${matchedLocation.type})`}
             {matchConfidence && (
               <Text style={styles.confidenceText}>
-                {'\n'}Match Confidence: {matchConfidence}%
+                {'\n'}Genauigkeit: {matchConfidence}%
               </Text>
             )}
           </Text>
@@ -242,7 +242,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
         onPress={toggleLocationsList}
       >
         <Text style={styles.locationToggleText}>
-          {showLocations ? '▼ Hide Available Locations' : '▶ Show Available Locations'}
+          {showLocations ? '▼ Verfügbare Ziele' : '▶ Zeige verfügbare Ziele'}
         </Text>
       </TouchableOpacity>
 
@@ -259,7 +259,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
                 </Text>
                 {item.aliases.length > 0 && (
                   <Text style={styles.aliasText}>
-                    Also: {item.aliases.join(', ')}
+                    Auch: {item.aliases.join(', ')}
                   </Text>
                 )}
               </View>

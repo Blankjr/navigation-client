@@ -13,9 +13,6 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
 
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
-    
-    // If it's a room-based location (like a professor's office), use the room number
-    // Otherwise use the location name (like 'lernraum', 'fachschaft', etc.)
     const destination = location.room || location.name.toLowerCase();
     onSearch(destination);
   };
@@ -25,10 +22,10 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
       <View style={styles.selectionArea}>
         {selectedLocation && (
           <View style={styles.selectedLocation}>
-            <Text style={styles.selectedTitle}>Selected Destination:</Text>
+            <Text style={styles.selectedTitle}>Ziel:</Text>
             <Text style={styles.selectedName}>{selectedLocation.name}</Text>
             {selectedLocation.room && (
-              <Text style={styles.selectedRoom}>Room: {selectedLocation.room}</Text>
+              <Text style={styles.selectedRoom}>Raum: {selectedLocation.room}</Text>
             )}
           </View>
         )}
@@ -43,7 +40,7 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
           onPress={() => handleLocationSelect(selectedLocation)}
           style={styles.confirmButton}
         >
-          Navigate to Destination
+          Zum Ziel
         </Button>
       )}
     </SafeAreaView>
