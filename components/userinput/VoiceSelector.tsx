@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from '
 import Voice from '@react-native-voice/voice';
 import { locations, Location } from '../../data/locations';
 import { complexNames } from '../../data/complexNames';
+import * as Speech from 'expo-speech';
 
 interface VoiceSelectorProps {
   onLocationSelect: (location: Location) => void;
@@ -34,8 +35,12 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
   };
 
   const handleSpeechError = (e) => {
-    setError('Error with speech recognition: ' + e.error?.message);
+    setError('Ziel nicht erkannt.');
     setIsListening(false);
+    Speech.speak('Bitte nochmal', {
+      language: 'de-DE',
+      rate: 1
+    });
   };
 
   const getLevenshteinDistance = (a, b) => {
@@ -177,8 +182,12 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
      setMatchConfidence(Math.round(bestMatchScore * 100));
      onLocationSelect(bestMatch);
    } else {
-     setError('No matching location found. Please try again.');
+     setError('Ziel nicht erkannt. Bitte wiederholen');
      setMatchConfidence(null);
+     Speech.speak('Bitte nochmal', {
+      language: 'de-DE',
+      rate: 1
+    });
    }
  };
 
@@ -216,7 +225,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
       </TouchableOpacity>
 
       {isListening && (
-        <Text style={styles.listeningText}>Listening...</Text>
+        <Text style={styles.listeningText}>am hören...</Text>
       )}
 
       {matchedLocation && (
@@ -231,10 +240,6 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
             )}
           </Text>
         </View>
-      )}
-
-      {error !== '' && (
-        <Text style={styles.errorText}>{error}</Text>
       )}
 
       <TouchableOpacity 
