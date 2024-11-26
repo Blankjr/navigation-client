@@ -46,8 +46,8 @@ const NavigationAudioGuide: React.FC<ImageGalleryProps> = ({ images }) => {
                 style={styles.button} 
                 icon={isSpeaking ? "stop" : "speaker"}
                 mode="contained" 
-                iconColor={isSpeaking ? '#ff0000' : '#ce7276'}
-                size={75}
+                iconColor={isSpeaking ? '#ff0000' : '#2F3C7E'}
+                size={100}
                 onPress={speak}
             />
         </View>
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     button: {
         borderRadius: 5,
-        width: 100,
+        width: 300,
         height: 100,
         borderColor: '#000000',
         borderWidth: 2

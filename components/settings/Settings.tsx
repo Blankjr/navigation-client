@@ -47,11 +47,13 @@ const Settings: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text variant="titleLarge" style={styles.title}>
-        Spracheinstellungen
+      <Text style={styles.title}>
+        Sprache
       </Text>
       <View style={styles.sliderContainer}>
-        <Text variant="bodyLarge">Sprechgeschwindigkeit: {speechRate.toFixed(1)}x</Text>
+        <Text style={styles.sliderLabel}>
+          Geschwindigkeit: {speechRate.toFixed(1)}x
+        </Text>
         <Slider
           style={styles.slider}
           value={speechRate}
@@ -71,14 +73,22 @@ const Settings: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 24,
     backgroundColor: '#fff',
   },
   title: {
-    marginBottom: 24,
+    fontSize: 32,
+    fontWeight: '600',
+    marginBottom: 32,
+    color: '#000',
   },
   sliderContainer: {
-    marginBottom: 16,
+    marginBottom: 24,
+  },
+  sliderLabel: {
+    fontSize: 24,
+    marginBottom: 12,
+    color: '#000',
   },
   slider: {
     marginTop: 8,

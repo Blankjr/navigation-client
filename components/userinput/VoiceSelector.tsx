@@ -215,76 +215,73 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.button, isListening && styles.buttonListening]}
-        onPress={isListening ? stopListening : startListening}
-      >
-        <Text style={styles.buttonText}>
-          {isListening ? 'Stop' : 'Sprachsuche'}
-        </Text>
-      </TouchableOpacity>
-
-      {isListening && (
-        <Text style={styles.listeningText}>am hören...</Text>
-      )}
-
-      {matchedLocation && (
-        <View style={styles.resultContainer}>
-          <Text style={styles.resultText}>
-            gefunden: {matchedLocation.name} 
-            {matchedLocation.room ? ` (Room ${matchedLocation.room})` : ` (${matchedLocation.type})`}
-            {matchConfidence && (
-              <Text style={styles.confidenceText}>
-                {'\n'}Genauigkeit: {matchConfidence}%
-              </Text>
-            )}
-          </Text>
-        </View>
-      )}
-
-      <TouchableOpacity 
-        style={styles.locationToggle}
-        onPress={toggleLocationsList}
-      >
-        <Text style={styles.locationToggleText}>
-          {showLocations ? '▼ Verfügbare Ziele' : '▶ Zeige verfügbare Ziele'}
-        </Text>
-      </TouchableOpacity>
-
-      {showLocations && (
-        <View style={styles.availableLocations}>
-          <FlatList
-            data={locations}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.locationItem}>
-                <Text style={styles.locationName}>
-                  • {item.name}
-                  {item.room ? ` (${item.room})` : ''}
-                </Text>
-                {item.aliases.length > 0 && (
-                  <Text style={styles.aliasText}>
-                    Auch: {item.aliases.join(', ')}
+      <View style={styles.contentContainer}>
+        {showLocations && (
+          <View style={styles.availableLocations}>
+            <FlatList
+              data={locations}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.locationItem}>
+                  <Text style={styles.locationName}>
+                    • {item.name}
+                    {item.room ? ` (${item.room})` : ''}
                   </Text>
-                )}
-              </View>
-            )}
-            style={styles.locationsList}
-          />
+                  {item.aliases.length > 0 && (
+                    <Text style={styles.aliasText}>
+                      Auch: {item.aliases.join(', ')}
+                    </Text>
+                  )}
+                </View>
+              )}
+              style={styles.locationsList}
+            />
+          </View>
+        )}
+
+        <View style={styles.bottomControls}>
+          <TouchableOpacity 
+            style={styles.locationToggle}
+            onPress={toggleLocationsList}
+          >
+            <Text style={styles.locationToggleText}>
+              {showLocations ? '▼ Verfügbare Ziele' : '▶ Zeige verfügbare Ziele'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, isListening && styles.buttonListening]}
+            onPress={isListening ? stopListening : startListening}
+          >
+            <Text style={styles.buttonText}>
+              {isListening ? 'Stop' : 'Sprachsuche'}
+            </Text>
+          </TouchableOpacity>
+
+          {isListening && (
+            <Text style={styles.listeningText}>am hören...</Text>
+          )}
         </View>
-      )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'flex-end', // This pushes content to the bottom
+  },
+  bottomControls: {
+    width: '100%',
   },
   button: {
     backgroundColor: '#007AFF',
-    padding: 15,
+    padding: 35,
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -302,28 +299,8 @@ const styles = StyleSheet.create({
     color: '#FF3B30',
     textAlign: 'center',
   },
-  resultContainer: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: '#E8E8E8',
-    borderRadius: 10,
-  },
-  resultText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  confidenceText: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
-  },
-  errorText: {
-    marginTop: 20,
-    color: '#FF3B30',
-    textAlign: 'center',
-  },
   locationToggle: {
-    marginTop: 20,
+    marginBottom: 20,
     padding: 10,
     backgroundColor: '#F0F0F0',
     borderRadius: 8,
@@ -334,8 +311,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   availableLocations: {
-    marginTop: 10,
-    height: Dimensions.get('window').height * 0.25, // Takes up 25% of screen height
+    marginBottom: 20,
+    height: Dimensions.get('window').height * 0.4, // Fixed height of 40% screen height
     borderRadius: 8,
     backgroundColor: '#F8F8F8',
     overflow: 'hidden',

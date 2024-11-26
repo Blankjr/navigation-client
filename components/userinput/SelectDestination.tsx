@@ -22,18 +22,13 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
       <View style={styles.selectionArea}>
         {selectedLocation && (
           <View style={styles.selectedLocation}>
-            <Text style={styles.selectedTitle}>Ziel:</Text>
             <Text style={styles.selectedName}>{selectedLocation.name}</Text>
             {selectedLocation.room && (
               <Text style={styles.selectedRoom}>Raum: {selectedLocation.room}</Text>
             )}
           </View>
         )}
-        
-        <VoiceSelector onLocationSelect={handleLocationSelect} />
-      </View>
-
-      {selectedLocation && (
+        {selectedLocation && (
         <Button
           icon="map-marker-radius"
           mode="contained"
@@ -43,6 +38,8 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
           Zum Ziel
         </Button>
       )}
+        <VoiceSelector onLocationSelect={handleLocationSelect} />
+      </View>
     </SafeAreaView>
   );
 };
