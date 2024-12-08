@@ -150,7 +150,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
  
  const findMatch = (spokenText) => {
    const normalizedInput = spokenText.toLowerCase().trim();
-   console.log('Spoken text:', normalizedInput);
+  //  console.log('Spoken text:', normalizedInput);
  
    let bestMatch = null;
    let bestMatchScore = 0;
@@ -166,7 +166,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
        currentBestScore = Math.max(currentBestScore, aliasScore);
      });
  
-     console.log(`Matching "${normalizedInput}" against "${location.name}": ${currentBestScore}`);
+    //  console.log(`Matching "${normalizedInput}" against "${location.name}": ${currentBestScore}`);
  
      if (currentBestScore > bestMatchScore) {
        bestMatchScore = currentBestScore;
@@ -174,7 +174,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ onLocationSelect }) => {
      }
    });
  
-   console.log('Best match score:', bestMatchScore);
+  //  console.log('Best match score:', bestMatchScore);
  
    // More lenient threshold for accepting matches
    if (bestMatch && bestMatchScore > 0.65) {

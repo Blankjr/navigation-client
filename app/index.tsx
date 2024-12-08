@@ -3,6 +3,12 @@ import { BottomNavigation } from 'react-native-paper';
 import SelectDestination from '@/components/userinput/SelectDestination';
 import Map from '@/components/visual/Map';
 import Settings from '@/components/settings/Settings';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  '`new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.',
+  '`new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.'
+]);
 
 export default function Index() {
   const [index, setIndex] = React.useState(0);
