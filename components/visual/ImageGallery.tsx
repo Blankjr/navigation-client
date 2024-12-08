@@ -3,7 +3,7 @@ import { StyleSheet, View, Dimensions, Text, AccessibilityInfo } from 'react-nat
 import { Image } from 'expo-image';
 import PagerView from 'react-native-pager-view';
 import { create } from 'zustand';
-import { ImageItem } from './Map';
+import { ImageItem } from './types';
 
 interface IGalleryStore {
     currentImageIndex: number
