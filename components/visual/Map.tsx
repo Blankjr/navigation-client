@@ -10,6 +10,14 @@ import LineIndicator from './LineIndicator';
 interface MapProps {
   destinationRoom: string;
 }
+interface GuideData {
+  lineDirections: {
+    [key: string]: string[];
+  };
+  waypoints: any[]; // Add proper type if needed
+  route: any[]; // Add proper type if needed
+  // Add other properties that exist in the response
+}
 
 const API_URL = 'http://192.168.1.107:3000/';
 
@@ -29,7 +37,11 @@ const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: s
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
-  return response.json();
+  const responseBody = await response.json();
+  console.log("new Calculated Way", responseBody);
+  
+  // console.log("Line Directions:", responseBody.lineDirections);
+  return responseBody;
 };
 
 const formatRoomForSpeech = (room: string): string => {
@@ -45,7 +57,7 @@ const formatRoomForSpeech = (room: string): string => {
 const Map: React.FC<MapProps> = ({ destinationRoom }) => {
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
-  const [initialGuideData, setInitialGuideData] = React.useState(null);
+  const [initialGuideData, setInitialGuideData] = React.useState<GuideData | null>(null);;
   const lastDestinationRef = React.useRef(destinationRoom);
 
   // Reset guide data when destination changes
@@ -105,7 +117,12 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
   let isSpeaking = false;
   return (
     <SafeAreaView style={styles.container}>
+      <LineIndicator 
+  currentGridSquare={currentGridSquare}
+  lineDirections={initialGuideData?.lineDirections}
+/>
       <View style={styles.content}>
+      
         <View style={styles.DestinationHeader}>
           <View style={styles.destinationInfo}
           accessibilityRole="button"
