@@ -6,30 +6,28 @@ import NavigationAudioGuide from '../audio/NavigationAudioGuide';
 import WebViewer from './WebViewer';
 import { Button } from 'react-native-paper';
 import * as Speech from 'expo-speech';
-
+import LineIndicator from './LineIndicator';
 interface MapProps {
-  destinationRoom: string; // This can be either a room number or a location name
+  destinationRoom: string;
 }
 
-const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app/';
-
-const fetchGuideData = async (startGridSquare: string, destinationRoom: string) => {
-  destinationRoom = destinationRoom.replace(/\s+/g, '-');
-  const response = await fetch(
-    `${API_URL}guide?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`
-  );
-  if (!response.ok) {
-    console.log(`${API_URL}guide?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`);
-    
-    throw new Error('Network response was not ok');
-  }
-  return response.json();
-};
+const API_URL = 'http://192.168.1.107:3000/';
 
 const fetchPositionData = async () => {
   const response = await fetch(`${API_URL}simulatedPosition/gridSquare/`);
   if (!response.ok) {
     throw new Error('Failed to fetch position data');
+  }
+  return response.json();
+};
+
+const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: string) => {
+  destinationRoom = destinationRoom.replace(/\s+/g, '-');
+  const response = await fetch(
+    `${API_URL}guide?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`
+  );
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
   }
   return response.json();
 };
@@ -44,19 +42,19 @@ const formatRoomForSpeech = (room: string): string => {
   return room;
 };
 
-
 const Map: React.FC<MapProps> = ({ destinationRoom }) => {
-  React.useEffect(() => {
-    if (destinationRoom) {
-      const spokenRoom = formatRoomForSpeech(destinationRoom);
-      Speech.speak(`Navigation zum Raum: ${spokenRoom}`, {
-      language: 'de-DE',
-      rate: 0.9
-    });
-    }
-  }, [destinationRoom]);
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
+  const [initialGuideData, setInitialGuideData] = React.useState(null);
+  const lastDestinationRef = React.useRef(destinationRoom);
+
+  // Reset guide data when destination changes
+  React.useEffect(() => {
+    if (destinationRoom !== lastDestinationRef.current) {
+      setInitialGuideData(null);
+      lastDestinationRef.current = destinationRoom;
+    }
+  }, [destinationRoom]);
 
   // Get current position with grid square
   const { data: positionData } = useQuery(
@@ -70,18 +68,29 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
     }
   );
 
-  // Fetch guide data using current grid square and destination
-  const { data: guideData, isLoading, error, refetch } = useQuery(
-    ['guideData', currentGridSquare, destinationRoom],
-    () => fetchGuideData(currentGridSquare, destinationRoom),
-    {
-      enabled: !!currentGridSquare && !!destinationRoom,
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  // Fetch guide data when position is available and we don't have guide data yet
+  React.useEffect(() => {
+    if (currentGridSquare && destinationRoom && !initialGuideData) {
+      fetchInitialGuideData(currentGridSquare, destinationRoom)
+        .then(data => {
+          setInitialGuideData(data);
+        })
+        .catch(error => console.error('Failed to fetch guide data:', error));
     }
-  );
+  }, [currentGridSquare, destinationRoom, initialGuideData]);
 
-  if (isLoading) {
+  // Initial speech when component mounts or destination changes
+  React.useEffect(() => {
+    if (destinationRoom) {
+      const spokenRoom = formatRoomForSpeech(destinationRoom);
+      Speech.speak(`Navigation zum Raum: ${spokenRoom}`, {
+        language: 'de-DE',
+        rate: 0.9
+      });
+    }
+  }, [destinationRoom]);
+
+  if (!currentGridSquare || !initialGuideData) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -89,17 +98,8 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
     );
   }
 
-  if (error) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text>{error.message}</Text>
-        <Button onPress={() => refetch()}>Retry</Button>
-      </View>
-    );
-  }
-
-  const relevantWaypoints = guideData?.waypoints.filter(waypoint => 
-    guideData.route.some(point => point.waypointId === waypoint.id)
+  const relevantWaypoints = initialGuideData?.waypoints.filter(waypoint => 
+    initialGuideData.route.some(point => point.waypointId === waypoint.id)
   ) || [];
 
   let isSpeaking = false;
@@ -120,22 +120,22 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
             }
           }}>
             <Button icon="target" contentStyle={{height: 80, alignItems: 'center'}}
-    labelStyle={{fontSize: 40, fontWeight: 'bold', lineHeight: 80, color: 'black'}}>{destinationRoom}</Button>
+              labelStyle={{fontSize: 40, fontWeight: 'bold', lineHeight: 80, color: 'black'}}>{destinationRoom}</Button>
           </View>
         </View>
       </View>
 
-      {guideData && (
+      {initialGuideData && (
         <>
           <ImageGallery images={relevantWaypoints} />
           <NavigationAudioGuide images={relevantWaypoints}/>
         </>
       )}
 
-<View style={styles.currentPosition}>
-            <Text style={styles.subtitle}>Position:</Text>
-            <Text style={styles.gridSquare}>{currentGridSquare || 'Determining...'}</Text>
-          </View>
+      <View style={styles.currentPosition}>
+        <Text style={styles.subtitle}>Position:</Text>
+        <Text style={styles.gridSquare}>{currentGridSquare || 'Determining...'}</Text>
+      </View>
 
       <Button 
         icon="web" 
@@ -152,6 +152,8 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
     </SafeAreaView>
   );
 };
+
+
 
 
 const styles = StyleSheet.create({
