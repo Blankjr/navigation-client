@@ -112,5 +112,33 @@ export const locations = [
         'professor wotschikowski',
         'professor wotschkowski'
     ]
+    },
+    {
+      id: '21',
+      name: 'Wissenschaftlicher Mitarbeiter',
+      type: 'room',
+      room: '04.2.002',
+      aliases: ['wissenschaftlicher mitarbeiter']
+    },
+    {
+      id: '22',
+      name: 'Labor',
+      type: 'room',
+      room: '04.2.014',
+      aliases: ['laborraum']
+    },
+    {
+      id: '23',
+      name: 'Seminarraum',
+      type: 'room',
+      room: '04.2.017',
+      aliases: ['seminar']
+    },
+    {
+      id: '24',
+      name: 'Sitzungsraum',
+      type: 'room',
+      room: '04.2.025',
+      aliases: ['sitzung', 'besprechungsraum']
     }
   ];
