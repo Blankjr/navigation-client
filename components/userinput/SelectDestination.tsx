@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Button } from 'react-native-paper';
 import { StyleSheet, SafeAreaView, View, Text } from 'react-native';
-import VoiceSelector from './VoiceSelector';
 import { Location } from '../../data/locations';
+import EnhancedLocationSelector from './EnhancedLocationSelector';
 
 interface SelectDestinationProps {
   onSearch: (destinationRoom: string) => void;
@@ -38,7 +38,7 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
           Zum Ziel
         </Button>
       )}
-        <VoiceSelector onLocationSelect={handleLocationSelect} />
+        <EnhancedLocationSelector onLocationSelect={handleLocationSelect} />
       </View>
     </SafeAreaView>
   );
