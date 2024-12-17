@@ -12,7 +12,30 @@ const LineIndicator: React.FC<LineIndicatorProps> = ({ currentGridSquare, lineDi
   const getNextColor = () => {
     if (!lineDirections || !currentGridSquare) return null;
 
-    //find which color we should follow from our current position
+    // Special handling for elevator positions
+    if (currentGridSquare.match(/^04\.[013]\.H3-P7$/)) {
+      // When on another floor, find the first color that will be used after 04.2.H3-P7
+      for (const [color, squares] of Object.entries(lineDirections)) {
+        const firstSquare = squares[0];
+        if (firstSquare) {
+          return color;
+        }
+      }
+      return null;
+    }
+
+    // For position 04.2.H3-P7 (just after elevator), find the first color line
+    if (currentGridSquare === '04.2.H3-P7') {
+      for (const [color, squares] of Object.entries(lineDirections)) {
+        const firstSquare = squares[0];
+        if (firstSquare) {
+          return color;
+        }
+      }
+      return null;
+    }
+
+    // Regular handling for other positions on floor 2
     for (const [color, squares] of Object.entries(lineDirections)) {
       if (squares.includes(currentGridSquare)) {
         return color;

@@ -14,19 +14,21 @@ interface GuideData {
   lineDirections: {
     [key: string]: string[];
   };
-  waypoints: any[]; // Add proper type if needed
-  route: any[]; // Add proper type if needed
-  // Add other properties that exist in the response
+  waypoints: any[];
+  route: any[];
 }
 
-const API_URL = 'http://192.168.1.107:3000/';
+const API_URL = 'http://192.168.1.109:3000/';
 
 const fetchPositionData = async () => {
   const response = await fetch(`${API_URL}simulatedPosition/gridSquare/`);
+  
   if (!response.ok) {
     throw new Error('Failed to fetch position data');
   }
-  return response.json();
+  const data = await response.json();
+  // console.log("Position", data);
+  return data;
 };
 
 const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: string) => {
@@ -38,9 +40,7 @@ const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: s
     throw new Error('Network response was not ok');
   }
   const responseBody = await response.json();
-  console.log("new Calculated Way", responseBody);
-  
-  // console.log("Line Directions:", responseBody.lineDirections);
+  console.log("Guide:", responseBody);
   return responseBody;
 };
 
@@ -163,9 +163,10 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
       </Button>
 
       <WebViewer 
-        isVisible={isWebViewVisible}
-        onClose={() => setIsWebViewVisible(false)}
-      />
+  isVisible={isWebViewVisible}
+  onClose={() => setIsWebViewVisible(false)}
+  destinationRoom={destinationRoom}
+/>
     </SafeAreaView>
   );
 };
