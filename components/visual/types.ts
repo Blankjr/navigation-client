@@ -2,7 +2,6 @@ export interface ImageItem {
     url: string;
     id?: string;
     description?: string;
-    // Add any other properties that your waypoints might have
   }
   
   export interface LineDirection {

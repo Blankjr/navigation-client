@@ -7,6 +7,8 @@ import WebViewer from './WebViewer';
 import { Button } from 'react-native-paper';
 import * as Speech from 'expo-speech';
 import LineIndicator from './LineIndicator';
+import SignInfo from './SignInfo';
+import { Location, RoomSignage, SignColor } from '../../data/locations';
 interface MapProps {
   destinationRoom: string;
 }
@@ -53,6 +55,21 @@ const formatRoomForSpeech = (room: string): string => {
   }
   return room;
 };
+
+const testSignage: RoomSignage = {
+  visualSign: "W/D",
+  tactileSign: "WD",
+  signColor: SignColor.RED
+};
+
+const currentLocation = {
+  name: 'test',
+  signage: testSignage
+}
+const currentLocation2 = {
+  name: 'test'
+}
+
 
 const Map: React.FC<MapProps> = ({ destinationRoom }) => {
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
@@ -143,20 +160,23 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
       </View>
 
       {initialGuideData && (
-        <>
-          <ImageGallery images={relevantWaypoints} />
-          <NavigationAudioGuide images={relevantWaypoints}/>
-        </>
-      )}
-
-      <View style={styles.currentPosition}>
-        <Text style={styles.subtitle}>Position:</Text>
-        <Text style={styles.gridSquare}>{currentGridSquare || 'Determining...'}</Text>
+  <>
+    <ImageGallery images={relevantWaypoints} />
+    <View style={styles.controlsRow}>
+      <View style={styles.controlHalf}>
+        <SignInfo signage={currentLocation?.signage} />
       </View>
+      <View style={styles.controlHalf}>
+        <NavigationAudioGuide images={relevantWaypoints}/>
+      </View>
+    </View>
+  </>
+)}
 
       <Button 
         icon="web" 
-        mode="contained" 
+        mode="contained"
+        style={styles.WebViewerButton} 
         onPress={() => setIsWebViewVisible(true)}
       >
         Ziel Info
@@ -238,6 +258,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#444',
   },
+  controlsRow: {
+    flexDirection: 'row',
+    height: 200,
+    marginVertical: 8,
+  },
+  controlHalf: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    borderWidth: 2,
+    borderColor: '#000',
+    borderRadius: 12,
+    margin: 3,
+  },
+  WebViewerButton: {
+    width: '100%',
+    height: 65,
+    justifyContent: 'center',
+  }
 });
 
 export default Map;

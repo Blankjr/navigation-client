@@ -1,10 +1,24 @@
+export enum SignColor {
+  RED = 'RED',
+  BLUE = 'BLUE',
+  GREEN = 'GREEN',
+  YELLOW = 'YELLOW',
+  BLACK = 'BLACK'
+}export interface RoomSignage {
+  visualSign: string;    // Visual text/symbol on the sign
+  tactileSign: string;   // Tactile representation
+  signColor: SignColor;     // Color of the sign
+}
 export interface Location {
   id: string;
   name: string;
   type: 'person' | 'room' | 'facility';
   room?: string;
   aliases: string[];
+  signage?: RoomSignage; 
 }
+
+const tactileBaseText = 'Rechts neben der tür befindet sich ein 3D Schild mit den Buchstaben'
 
 export const locations: Location[] = [
   {
@@ -12,7 +26,12 @@ export const locations: Location[] = [
     name: 'PC Pool',
     type: 'facility',
     room: '04.2.028',
-    aliases: ['pc raum', 'computerraum', 'pc labor']
+    aliases: ['pc raum', 'computerraum', 'pc labor'],
+    signage: {
+      visualSign: 'PC',
+      tactileSign: `${tactileBaseText} P und C auf der Höhe 150cm.`,
+      signColor: SignColor.RED
+    }
   },
   {
     id: '2',
@@ -36,7 +55,12 @@ export const locations: Location[] = [
     id: '5',
     name: 'Fachschaft',
     type: 'room',
-    aliases: ['fs', 'fachschaftsraum']
+    aliases: ['fs', 'fachschaftsraum'],
+    signage: {
+      visualSign: 'FR',
+      tactileSign: `${tactileBaseText} F und R auf der Höhe 150cm.`,
+      signColor: SignColor.BLUE
+    }
   },
   {
     id: '6',
@@ -178,14 +202,24 @@ export const locations: Location[] = [
     name: 'Professor Dahm',
     type: 'person',
     room: '04.2.010',
-    aliases: ['professor markus dahm', 'herr dahm', 'frau dahm', 'dahm', 'professor dahm', 'dam']
+    aliases: ['professor markus dahm', 'herr dahm', 'frau dahm', 'dahm', 'professor dahm', 'dam'],
+    signage: {
+      visualSign: "W/D",
+      tactileSign: `${tactileBaseText} W und D auf der Höhe 150cm.`,
+      signColor: SignColor.RED
+    }
   },
   {
     id: '28',
     name: 'Professor Wojciechowski',
     type: 'person',
     room: '04.2.010',
-    aliases: ['professor manfred wojciechowski', 'herr wojciechowski', 'frau wojciechowski', 'wojo', 'wolle', 'professor wojo', 'wojciechowski', 'wojiechowski', 'wotschikowski', 'wotschkowski', 'woschkowski', 'professor wotschikowski', 'professor wotschkowski', 'voichiechovski', 'wojciechovski']
+    aliases: ['professor manfred wojciechowski', 'herr wojciechowski', 'frau wojciechowski', 'wojo', 'wolle', 'professor wojo', 'wojciechowski', 'wojiechowski', 'wotschikowski', 'wotschkowski', 'woschkowski', 'professor wotschikowski', 'professor wotschkowski', 'voichiechovski', 'wojciechovski'],
+    signage: {
+      visualSign: "W/D",
+      tactileSign: `${tactileBaseText} W und D auf der Höhe 150cm.`,
+      signColor: SignColor.RED
+    }
   },
   {
     id: '29',

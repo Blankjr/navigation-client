@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import * as Speech from 'expo-speech';
 import { ImageGalleryProps, useGalleryStore } from '../visual/ImageGallery';
 import { IconButton } from 'react-native-paper';
@@ -41,16 +41,22 @@ const NavigationAudioGuide: React.FC<ImageGalleryProps> = ({ images }) => {
     }, [imageIndex, images, isSpeaking]);
 
     return (
-        <View style={styles.container}>
-             <IconButton
+        <Pressable 
+            style={styles.container}
+            onPress={speak}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Beschreibung vorlesen"
+        >
+            <IconButton
                 style={styles.button} 
                 icon={isSpeaking ? "stop" : "speaker"}
                 mode="contained" 
                 iconColor={isSpeaking ? '#ff0000' : '#2F3C7E'}
-                size={100}
+                size={120}
                 onPress={speak}
             />
-        </View>
+        </Pressable>
     );
 }
 
@@ -59,15 +65,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ecf0f1',
-        padding: 8,
     },
     button: {
-        borderRadius: 5,
-        width: 300,
-        height: 100,
-        borderColor: '#000000',
-        borderWidth: 2
+        width: 120,
+        height: 120,
     },
 });
 
