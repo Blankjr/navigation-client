@@ -5,7 +5,7 @@ import { Location } from '../../data/locations';
 import EnhancedLocationSelector from './EnhancedLocationSelector';
 
 interface SelectDestinationProps {
-  onSearch: (destinationRoom: string) => void;
+  onSearch: (location: Location) => void;
 }
 
 const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
@@ -13,8 +13,7 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
 
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
-    const destination = location.room || location.name.toLowerCase();
-    onSearch(destination);
+    onSearch(location);
   };
 
   return (

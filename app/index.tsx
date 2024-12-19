@@ -4,6 +4,8 @@ import SelectDestination from '@/components/userinput/SelectDestination';
 import Map from '@/components/visual/Map';
 import Settings from '@/components/settings/Settings';
 import { LogBox } from 'react-native';
+import { Location } from '@/data/locations';
+
 
 LogBox.ignoreLogs([
   '`new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.',
@@ -12,7 +14,7 @@ LogBox.ignoreLogs([
 
 export default function Index() {
   const [index, setIndex] = React.useState(0);
-  const [destinationRoom, setDestinationRoom] = React.useState('');
+  const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
 
   const routes = [
     { key: 'selectDestination', title: 'Ziel wählen', unfocusedIcon: 'arrow-decision-outline', focusedIcon: 'arrow-decision' },
@@ -20,17 +22,17 @@ export default function Index() {
     { key: 'settings', title: 'Einstellungen', unfocusedIcon: 'cog-outline', focusedIcon: 'cog' },
   ];
 
-  const handleSearch = (destination: string) => {
-    setDestinationRoom(destination);
+  const handleSearch = (location: Location) => {
+    setSelectedLocation(location);
     setIndex(1); // Switch to Map
   };
 
-  const renderScene = ({ route }) => {
+  const renderScene = ({ route }: { route: any}) => {
     switch (route.key) {
       case 'selectDestination':
         return <SelectDestination onSearch={handleSearch} />;
       case 'map':
-        return <Map destinationRoom={destinationRoom} />;
+        return selectedLocation ? <Map selectedLocation={selectedLocation} /> : null;
       case 'settings':
         return <Settings />;
       default:

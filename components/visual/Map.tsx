@@ -10,7 +10,7 @@ import LineIndicator from './LineIndicator';
 import SignInfo from './SignInfo';
 import { Location, RoomSignage, SignColor } from '../../data/locations';
 interface MapProps {
-  destinationRoom: string;
+  selectedLocation: Location | null;
 }
 interface GuideData {
   lineDirections: {
@@ -56,25 +56,13 @@ const formatRoomForSpeech = (room: string): string => {
   return room;
 };
 
-const testSignage: RoomSignage = {
-  visualSign: "W/D",
-  tactileSign: "WD",
-  signColor: SignColor.RED
-};
 
-const currentLocation = {
-  name: 'test',
-  signage: testSignage
-}
-const currentLocation2 = {
-  name: 'test'
-}
-
-
-const Map: React.FC<MapProps> = ({ destinationRoom }) => {
+const Map: React.FC<MapProps> = ({ selectedLocation }) => {
   const [isWebViewVisible, setIsWebViewVisible] = React.useState(false);
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
   const [initialGuideData, setInitialGuideData] = React.useState<GuideData | null>(null);;
+  // Get destination room from selectedLocation
+  const destinationRoom = selectedLocation?.room || selectedLocation?.name?.toLowerCase() || '';
   const lastDestinationRef = React.useRef(destinationRoom);
 
   // Reset guide data when destination changes
@@ -164,7 +152,7 @@ const Map: React.FC<MapProps> = ({ destinationRoom }) => {
     <ImageGallery images={relevantWaypoints} />
     <View style={styles.controlsRow}>
       <View style={styles.controlHalf}>
-        <SignInfo signage={currentLocation?.signage} />
+        <SignInfo signage={selectedLocation?.signage} />
       </View>
       <View style={styles.controlHalf}>
         <NavigationAudioGuide images={relevantWaypoints}/>
