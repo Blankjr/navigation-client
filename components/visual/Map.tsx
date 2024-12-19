@@ -30,7 +30,6 @@ const fetchPositionData = async () => {
     throw new Error('Failed to fetch position data');
   }
   const data = await response.json();
-  // console.log("Position", data);
   return data;
 };
 
@@ -43,6 +42,8 @@ const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: s
     throw new Error('Network response was not ok');
   }
   const responseBody = await response.json();
+  console.log(`${API_URL}guide?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`);
+  
   console.log("Guide:", responseBody);
   return responseBody;
 };
@@ -143,8 +144,19 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
               });
             }
           }}>
-            <Button icon="target" contentStyle={{height: 80, alignItems: 'center'}}
-              labelStyle={{fontSize: 40, fontWeight: 'bold', lineHeight: 80, color: 'black'}}>{destinationRoom}</Button>
+            <Button
+              icon="target"
+              contentStyle={{ height: 80, alignItems: 'center' }}
+              labelStyle={{
+                fontSize: 40,
+                fontWeight: 'bold',
+                lineHeight: 80,
+                color: 'black',
+                textAlign: 'center',
+              }}
+            >
+            {destinationRoom.split(' ')[0][0].toUpperCase() + destinationRoom.split(' ')[0].slice(1)}
+            </Button>
           </View>
         </View>
       </View>
