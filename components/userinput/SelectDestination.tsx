@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button } from 'react-native-paper';
-import { StyleSheet, SafeAreaView, View, Text } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, Keyboard } from 'react-native';
 import { Location } from '../../data/locations';
 import EnhancedLocationSelector from './EnhancedLocationSelector';
 
@@ -56,7 +56,10 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
         <Button
           icon="map-marker-radius"
           mode="contained"
-          onPress={() => selectedLocation && handleLocationSelect(selectedLocation)}
+          onPress={() => {
+            Keyboard.dismiss();
+            selectedLocation && handleLocationSelect(selectedLocation)}
+          }
           style={styles.confirmButton}
           labelStyle={styles.buttonLabel}
           disabled={!selectedLocation}
@@ -116,8 +119,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   confirmButton: {
-    marginTop: 24,
-    marginBottom: 24,
+    marginTop: 10,
+    marginBottom: 10,
     opacity: 1,
     height: 80,
     justifyContent: 'center',
