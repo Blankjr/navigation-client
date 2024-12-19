@@ -23,11 +23,14 @@ const NavigationAudioGuide: React.FC<ImageGalleryProps> = ({ images }) => {
         } else {
             const imageDescription = images[imageIndex].description;
             setIsSpeaking(true);
-            
-            console.log(imageIndex);
+
+            if (!imageDescription) {
+                console.error("No description available for this image");
+                return;
+            }
             
             try {
-                await Speech.speak(imageDescription, {
+                Speech.speak(imageDescription, {
                     language: "de-DE",
                     rate: speechRate,
                     onDone: () => setIsSpeaking(false),
