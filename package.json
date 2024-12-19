@@ -50,7 +50,8 @@
     "react-native-webview": "13.8.6",
     "react-native-wifi-reborn": "^4.13.0",
     "react-query": "^3.39.3",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "^5.0.0-rc.2",
+    "@react-native-async-storage/async-storage": "1.23.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

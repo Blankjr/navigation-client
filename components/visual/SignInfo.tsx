@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 import * as Speech from 'expo-speech';
 import { RoomSignage, SignColor } from '../../data/locations';
+import { useAudioStore } from '@/stores/useAudioStore';
 
 interface SignInfoProps {
   signage?: RoomSignage;
@@ -37,6 +38,7 @@ interface ColorMapping {
   };
 
 const SignInfo: React.FC<SignInfoProps> = ({ signage }) => {
+  const speechRate = useAudioStore((state: { speechRate: number; }) => state.speechRate);
     const getColorInfo = (color: SignColor): ColorMapping => {
         return colorMappings[color] || {
           spokenName: 'grauen',
@@ -54,11 +56,13 @@ const SignInfo: React.FC<SignInfoProps> = ({ signage }) => {
           const colorInfo = getColorInfo(signage.signColor);
           const spokenSign = formatSignForSpeech(signage.visualSign);
           Speech.speak(`Suchen Sie nach einem ${colorInfo.spokenName} Schild mit der Kennzeichnung ${spokenSign}`, {
-            language: 'de-DE'
+            language: 'de-DE',
+            rate: speechRate
           });
         } else {
           Speech.speak("Der Raum wurde noch nicht mit einem geeigneten Schild versehen.", {
-            language: 'de-DE'
+            language: 'de-DE',
+            rate: speechRate
           });
         }
       };

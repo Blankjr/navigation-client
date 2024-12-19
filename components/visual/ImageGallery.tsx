@@ -48,7 +48,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
     if (!images || images.length === 0) {
       return (
         <View style={styles.container}>
-          <Text>No images available</Text>
+          <Text>Kein Bild verfügbar</Text>
         </View>
       );
     }

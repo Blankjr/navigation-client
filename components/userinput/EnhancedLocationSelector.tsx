@@ -5,6 +5,7 @@ import Voice from '@react-native-voice/voice';
 import { locations, Location } from '../../data/locations';
 import { complexNames } from '../../data/complexNames';
 import * as Speech from 'expo-speech';
+import { useAudioStore } from '@/stores/useAudioStore';
 
 // Generate room numbers from 1 to 40 with simple aliases
 const generateRoomNumbers = () => {
@@ -35,6 +36,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [matchConfidence, setMatchConfidence] = useState<number | null>(null);
+  const speechRate = useAudioStore((state) => state.speechRate);
 
   useEffect(() => {
     Voice.onSpeechStart = () => setIsListening(true);
@@ -167,7 +169,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
       setMatchConfidence(null);
       Speech.speak('Bitte nochmal', {
         language: 'de-DE',
-        rate: 1
+        rate: speechRate
       });
     }
   };
@@ -207,7 +209,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
     setIsListening(false);
     Speech.speak('Bitte nochmal', {
       language: 'de-DE',
-      rate: 1
+      rate: speechRate
     });
   };
 
