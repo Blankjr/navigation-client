@@ -16,27 +16,58 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
     onSearch(location);
   };
 
+  const calculateFontSize = (text: string, baseSize: number) => {
+    return text.length > 20 ? baseSize - 4 : baseSize; // Adjust font size for longer text
+  };
+
+  const displayName = selectedLocation?.name === "Wissenschaftlicher Mitarbeiter"
+  ? "Mitarbeiter"
+  : selectedLocation?.name;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.selectionArea}>
-        {selectedLocation && (
-          <View style={styles.selectedLocation}>
-            <Text style={styles.selectedName}>{selectedLocation.name}</Text>
-            {selectedLocation.room && (
-              <Text style={styles.selectedRoom}>Raum: {selectedLocation.room}</Text>
-            )}
-          </View>
-        )}
-        {selectedLocation && (
+        <View style={[
+          styles.selectedLocation,
+          !selectedLocation && styles.selectedLocationEmpty
+        ]}
+        accessible={true}
+        accessibilityRole="header"
+        accessibilityLabel={selectedLocation 
+          ? `Ausgewähltes Ziel: ${selectedLocation.name}${selectedLocation.room ? `, Raum ${selectedLocation.room}` : ''}`
+          : "Kein Ziel ausgewählt"
+        }
+        >
+          {selectedLocation ? (
+            <>
+              <Text style={[
+    styles.selectedName,
+    { fontSize: calculateFontSize(selectedLocation.name, 32) },
+  ]} numberOfLines={2} ellipsizeMode='tail'>{displayName}</Text>
+              {selectedLocation.room && (
+                <Text style={styles.selectedRoom}>Raum: {selectedLocation.room}</Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.placeholderText}>Kein Ziel ausgewählt</Text>
+          )}
+        </View>
+
         <Button
           icon="map-marker-radius"
           mode="contained"
-          onPress={() => handleLocationSelect(selectedLocation)}
+          onPress={() => selectedLocation && handleLocationSelect(selectedLocation)}
           style={styles.confirmButton}
+          labelStyle={styles.buttonLabel}
+          disabled={!selectedLocation}
+          accessibilityLabel={selectedLocation 
+            ? `Navigation zu ${selectedLocation.name} starten` 
+            : "Navigation nicht möglich ohne ausgewähltes Ziel"
+          }
         >
           Zum Ziel
         </Button>
-      )}
+
         <EnhancedLocationSelector onLocationSelect={handleLocationSelect} />
       </View>
     </SafeAreaView>
@@ -47,34 +78,55 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#FFFFFF',
   },
   selectionArea: {
     flex: 1,
   },
   selectedLocation: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
+    backgroundColor: '#E6F0FF',
+    padding: 24,
+    borderRadius: 12,
+    marginBottom: 24,
+    minHeight: 120,
+    borderWidth: 2,
+    borderColor: '#0052CC',
   },
-  selectedTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
+  selectedLocationEmpty: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selectedName: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginTop: 5,
+    marginTop: 8,
+    color: '#000000',
+    flexWrap: 'wrap',
+    lineHeight: 36,
   },
   selectedRoom: {
-    fontSize: 16,
-    color: '#333',
-    marginTop: 5,
+    fontSize: 24,
+    color: '#000000',
+    marginTop: 8,
+    fontWeight: '500',
+  },
+  placeholderText: {
+    fontSize: 24,
+    color: '#0052CC',
+    fontWeight: '500',
   },
   confirmButton: {
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 24,
+    marginBottom: 24,
+    opacity: 1,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonLabel: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    lineHeight: 32
   },
 });
 

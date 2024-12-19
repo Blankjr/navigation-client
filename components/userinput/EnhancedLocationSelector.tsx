@@ -231,55 +231,60 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Searchbar
-          placeholder="Raum oder Name eingeben"
-          onChangeText={handleSearch}
-          value={searchQuery}
-          style={styles.searchBar}
-        />
-        
-        {showDropdown && filteredLocations.length > 0 && (
-          <View style={styles.dropdown}>
-            <FlatList
-              data={filteredLocations}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <List.Item
-                  title={item.name}
-                  onPress={() => handleLocationPress(item)}
-                  style={styles.dropdownItem}
-                />
-              )}
-              style={styles.dropdownList}
+  <View style={styles.container}>
+  <View style={styles.searchContainer}>
+    <Searchbar
+      placeholder="Raum oder Name"
+      onChangeText={handleSearch}
+      value={searchQuery}
+      style={styles.searchBar}
+      inputStyle={styles.searchBarInput}
+      iconColor="#0052CC"
+      placeholderTextColor="#666666"
+    />
+    
+    {showDropdown && filteredLocations.length > 0 && (
+      <View style={styles.dropdown}>
+        <FlatList
+          data={filteredLocations}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <List.Item
+              title={item.name}
+              titleStyle={styles.dropdownItemText}
+              onPress={() => handleLocationPress(item)}
+              style={styles.dropdownItem}
             />
-          </View>
-        )}
+          )}
+          style={styles.dropdownList}
+        />
       </View>
+    )}
+  </View>
 
-      <View style={styles.voiceContainer}>
-        <TouchableOpacity
-          style={[styles.voiceButton, isListening && styles.buttonListening]}
-          onPress={isListening ? stopListening : startListening}
-        >
-          <Text style={styles.buttonText}>
-            {isListening ? 'Stop' : 'Sprachsuche'}
-          </Text>
-        </TouchableOpacity>
+  <View style={styles.voiceContainer}>
+    <TouchableOpacity
+      style={[styles.voiceButton, isListening && styles.buttonListening]}
+      onPress={isListening ? stopListening : startListening}
+    >
+      <Text style={styles.buttonText}>
+        {isListening ? 'Stop' : 'Sprachsuche'}
+      </Text>
+    </TouchableOpacity>
 
-        {isListening && (
-          <Text style={styles.listeningText}>am hören...</Text>
-        )}
-        
-        {error !== '' && (
-          <Text style={styles.errorText}>{error}</Text>
-        )}
-      </View>
-    </View>
+    {isListening && (
+      <Text style={styles.listeningText}>am hören...</Text>
+    )}
+    
+    {error !== '' && (
+      <Text style={styles.errorText}>{error}</Text>
+    )}
+  </View>
+</View>
   );
 };
 
+const screenHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -290,53 +295,80 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   searchBar: {
-    marginBottom: 10,
+    marginBottom: 16,
     elevation: 4,
+    height: 70,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#0052CC',
+  },
+  searchBarInput: {
+    fontSize: 24,
+    height: 70,
+    color: '#000000',
   },
   dropdown: {
     position: 'absolute',
-    top: 60,
+    bottom: 74,
     left: 0,
     right: 0,
-    backgroundColor: 'white',
-    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     elevation: 4,
-    maxHeight: 300,
+    maxHeight: Math.min(300, screenHeight * 0.4),
+    borderWidth: 2,
+    borderColor: '#0052CC',
+    zIndex: 1000,
   },
   dropdownList: {
     flex: 1,
   },
   dropdownItem: {
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#E6E6E6',
+    minHeight: 60,
+    justifyContent: 'center',
+  },
+  dropdownItemText: {
+    fontSize: 20,
+    color: '#000000',
+    padding: 12,
   },
   voiceContainer: {
-    marginTop: 20,
-  },
-  voiceButton: {
-    backgroundColor: '#007AFF',
-    padding: 35,
-    borderRadius: 10,
+    marginTop: 24,
     alignItems: 'center',
   },
+  voiceButton: {
+    backgroundColor: '#0052CC',
+    padding: 40,
+    borderRadius: 16,
+    alignItems: 'center',
+    width: '100%',
+    minHeight: 180,
+    justifyContent: 'center',
+  },
   buttonListening: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#DC2626',
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
+    color: '#FFFFFF',
+    fontSize: 32,
     fontWeight: 'bold',
   },
   listeningText: {
-    marginTop: 20,
-    fontSize: 16,
-    color: '#FF3B30',
+    marginTop: 24,
+    fontSize: 24,
+    color: '#DC2626',
     textAlign: 'center',
+    fontWeight: '500',
   },
   errorText: {
-    marginTop: 10,
-    color: '#FF3B30',
+    marginTop: 16,
+    color: '#DC2626',
     textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '500',
   },
 });
 
