@@ -64,141 +64,135 @@ export const locations: Location[] = [
   },
   {
     id: '6',
-    name: 'Audimax',
-    type: 'room',
-    aliases: ['audi', 'großer hörsaal']
-  },
-  {
-    id: '7',
     name: 'Labor Interaktive Systeme',
     type: 'room',
     aliases: ['interaktive systeme', 'interaktionslabor', 'labor is']
   },
   {
-    id: '8',
+    id: '7',
     name: 'Labor Mixed Reality',
     type: 'room',
     aliases: ['mixed reality', 'vr labor', 'ar labor', 'mr labor']
   },
   {
-    id: '9',
+    id: '8',
     name: 'Labor Computergrafik',
     type: 'room',
     aliases: ['computergrafiklabor', 'cg labor', 'grafiklabor']
   },
   {
-    id: '10',
+    id: '9',
     name: 'Labor IT Sicherheit',
     type: 'room',
     aliases: ['it security', 'security labor', 'it sec']
   },
   {
-    id: '11',
+    id: '10',
     name: 'Labor Multimedia Kommunikation',
     type: 'room',
     aliases: ['multimedia labor', 'mmk labor', 'multimedia']
   },
   {
-    id: '12',
+    id: '11',
     name: 'Labor Webtechnologie',
     type: 'room',
     aliases: ['weblabor', 'web labor', 'webtech']
   },
   {
-    id: '13',
+    id: '12',
     name: 'Seminarraum',
     type: 'room',
     room: '04.2.017',
     aliases: ['seminar', 'seminar raum']
   },
   {
-    id: '14',
+    id: '13',
     name: 'Labor Digitaltechnik',
     type: 'room',
     aliases: ['digitallabor', 'digital labor']
   },
   {
-    id: '15',
+    id: '14',
     name: 'Labor Datenbanken',
     type: 'room',
     aliases: ['datenbanklabor', 'db labor', 'dblabor']
   },
   {
-    id: '16',
+    id: '15',
     name: 'Labor AV Produktion',
     type: 'room',
     aliases: ['av labor', 'audio video labor', 'av labor']
   },
   {
-    id: '17',
+    id: '16',
     name: 'Sitzungsraum',
     type: 'room',
     room: '04.2.025',
     aliases: ['sitzungszimmer', 'besprechungsraum', 'sitzung']
   },
   {
-    id: '18',
+    id: '19',
     name: 'Labor Mediengestaltung',
     type: 'room',
     aliases: ['medienlabor', 'gestaltungslabor', 'mediengestaltungslabor']
   },
   {
-    id: '19',
+    id: '20',
     name: 'Lehrbeauftragte',
     type: 'room',
     aliases: ['dozenten', 'lehrbeauftragtenraum']
   },
   {
-    id: '20',
+    id: '21',
     name: 'Wissenschaftlicher Mitarbeiter',
     type: 'room',
     room: '04.2.002',
     aliases: ['wissenschaftlicher mitarbeiter']
   },
   {
-    id: '21',
+    id: '22',
     name: 'Professor Huldtgren',
     type: 'person',
     room: '04.2.005',
     aliases: ['professor alina huldtgren', 'professorin huldtgren', 'frau huldtgren', 'herr huldtgren', 'huldtgren', 'hultgren', 'professor huldtgren']
   },
   {
-    id: '22',
+    id: '23',
     name: 'Professor Schwab Trapp',
     type: 'person',
     room: '04.2.005',
     aliases: ['professor gabriele schwab trapp', 'professorin schwab trapp', 'frau schwab trapp', 'herr schwab trapp', 'schwab trapp', 'schwabtrapp', 'professor schwab trapp']
   },
   {
-    id: '23',
+    id: '24',
     name: 'Professor Bonse',
     type: 'person',
     room: '04.2.006',
     aliases: ['professor thomas bonse', 'herr bonse', 'frau bonse', 'bonse', 'professor bonse']
   },
   {
-    id: '24',
+    id: '25',
     name: 'Professor Mostafawy',
     type: 'person',
     room: '04.2.006',
     aliases: ['professor sina mostafawy', 'herr mostafawy', 'frau mostafawy', 'mostafawy', 'mostafawi', 'professor mostafawy']
   },
   {
-    id: '25',
+    id: '26',
     name: 'Professor Herder',
     type: 'person',
     room: '04.2.009',
     aliases: ['professor jens herder', 'herr herder', 'frau herder', 'herder', 'professor herder', 'härder']
   },
   {
-    id: '26',
+    id: '27',
     name: 'Professor Huber',
     type: 'person',
     room: '04.2.009',
     aliases: ['professor florian huber', 'herr huber', 'frau huber', 'huber', 'professor huber']
   },
   {
-    id: '27',
+    id: '28',
     name: 'Professor Dahm',
     type: 'person',
     room: '04.2.010',
@@ -210,7 +204,7 @@ export const locations: Location[] = [
     }
   },
   {
-    id: '28',
+    id: '29',
     name: 'Professor Wojciechowski',
     type: 'person',
     room: '04.2.010',
@@ -222,14 +216,14 @@ export const locations: Location[] = [
     }
   },
   {
-    id: '29',
+    id: '30',
     name: 'Professor Rakow',
     type: 'person',
     room: '04.2.039',
     aliases: ['professor thomas rakow', 'herr rakow', 'frau rakow', 'rakow', 'rackov', 'rakov', 'professor rakow']
   },
   {
-    id: '30',
+    id: '31',
     name: 'Professor Franz',
     type: 'person',
     room: '04.2.040',
