@@ -42,11 +42,18 @@ const SignInfo: React.FC<SignInfoProps> = ({ signage }) => {
           spokenName: 'grauen',
           cssColor: '#808080'
         };
-      };  
+      };
+
+      const formatSignForSpeech = (text: string): string => {
+        // Add spaces between all characters
+        return text.split('').join(' ');
+      };
+
       const announceSign = () => {
         if (signage) {
           const colorInfo = getColorInfo(signage.signColor);
-          Speech.speak(`Suchen Sie nach einem ${colorInfo.spokenName} Schild mit der Kennzeichnung ${signage.visualSign}`, {
+          const spokenSign = formatSignForSpeech(signage.visualSign);
+          Speech.speak(`Suchen Sie nach einem ${colorInfo.spokenName} Schild mit der Kennzeichnung ${spokenSign}`, {
             language: 'de-DE'
           });
         } else {
