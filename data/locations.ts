@@ -20,6 +20,23 @@ export interface Location {
 
 const tactileBaseText = 'Rechts neben der tür befindet sich ein 3D Schild mit den Buchstaben'
 
+export const findSignageByRoom = (room: string, locations: Location[]): Location['signage'] | undefined => {
+  // Normalize the room number by removing leading zeros after dots
+  const normalizeRoom = (r: string) => {
+    return r.replace(/\.0+/g, '.');
+  };
+  
+  const normalizedSearchRoom = normalizeRoom(room);
+  
+  // Find all locations with matching room number
+  const matchingLocations = locations.filter(location => 
+    location.room && normalizeRoom(location.room) === normalizedSearchRoom
+  );
+
+  // Return the signage from the first location that has it
+  return matchingLocations.find(loc => loc.signage)?.signage;
+};
+
 export const locations: Location[] = [
   {
     id: '1',
