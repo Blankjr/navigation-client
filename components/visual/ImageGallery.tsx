@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StyleSheet, View, Dimensions, Text, AccessibilityInfo } from 'react-native';
 import { Image } from 'expo-image';
 import PagerView from 'react-native-pager-view';
@@ -6,70 +6,94 @@ import { create } from 'zustand';
 import { ImageItem } from './types';
 
 interface IGalleryStore {
-    currentImageIndex: number
-    updateCurrentImageIndex: (newIndex: number) => void
+    currentImageIndex: number;
+    updateCurrentImageIndex: (newIndex: number) => void;
 }
 
 export const useGalleryStore = create<IGalleryStore>()((set) => ({
-  currentImageIndex: 0,
-  updateCurrentImageIndex: (newIndex: number) => set({ currentImageIndex: newIndex}),
+    currentImageIndex: 0,
+    updateCurrentImageIndex: (newIndex: number) => set({ currentImageIndex: newIndex }),
 }));
 
-const blurhash =
-  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+const blurhash = '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 export interface ImageGalleryProps {
-  images: ImageItem[];
+    images: ImageItem[];
+    currentGridSquare?: string;
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
+const ImageGallery: React.FC<ImageGalleryProps> = ({ images, currentGridSquare }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const updateCurrentImageIndex = useGalleryStore(state => state.updateCurrentImageIndex);
-  
+    const pagerRef = React.useRef<PagerView>(null);
+
+    useEffect(() => {
+        if (currentGridSquare && images.length > 0) {
+            // Find the index of the image that matches the current grid square
+            const matchingIndex = images.findIndex(image => {
+                // Extract grid square ID from image URL or ID
+                const imageId = image.id || image.url.split('/').pop()?.split('.')[0];
+                return imageId === currentGridSquare;
+            });
+
+            if (matchingIndex !== -1 && matchingIndex !== currentPage) {
+                // Set the page programmatically
+                pagerRef.current?.setPage(matchingIndex);
+                setCurrentPage(matchingIndex);
+                updateCurrentImageIndex(matchingIndex);
+
+                // Announce the change for accessibility
+                if (images[matchingIndex]?.description) {
+                    AccessibilityInfo.announceForAccessibility(
+                        `Automatisch gewechselt zu Bild ${matchingIndex + 1} von ${images.length}. ${images[matchingIndex].description}`
+                    );
+                }
+            }
+        }
+    }, [currentGridSquare, images]);
+
     const onPageSelected = useCallback((e: { nativeEvent: { position: number } }) => {
-      const newPage = e.nativeEvent.position;
-      setCurrentPage(newPage);
-      updateCurrentImageIndex(newPage);
-      
-      // Safety check for valid image and description
-      if (images && images[newPage] && images[newPage].description) {
-        AccessibilityInfo.announceForAccessibility(
-          `Image ${newPage + 1} of ${images.length}. ${images[newPage].description}`
-        );
-      } else {
-        // Fallback announcement if description is missing
-        AccessibilityInfo.announceForAccessibility(
-          `Image ${newPage + 1} of ${images.length}`
-        );
-      }
+        const newPage = e.nativeEvent.position;
+        setCurrentPage(newPage);
+        updateCurrentImageIndex(newPage);
+        
+        if (images && images[newPage] && images[newPage].description) {
+            AccessibilityInfo.announceForAccessibility(
+                `Bild ${newPage + 1} von ${images.length}. ${images[newPage].description}`
+            );
+        } else {
+            AccessibilityInfo.announceForAccessibility(
+                `Bild ${newPage + 1} von ${images.length}`
+            );
+        }
     }, [images, updateCurrentImageIndex]);
 
-    // Safety check for empty images array
     if (!images || images.length === 0) {
-      return (
-        <View style={styles.container}>
-          <Text>Kein Bild verfügbar</Text>
-        </View>
-      );
+        return (
+            <View style={styles.container}>
+                <Text>Kein Bild verfügbar</Text>
+            </View>
+        );
     }
 
     return (
       <View style={styles.container}>
         <PagerView 
-          style={styles.pagerView} 
-          initialPage={0}
-          onPageSelected={onPageSelected}
-          accessible={true}
-          accessibilityLabel={`Image gallery with ${images.length} images`}
-          accessibilityHint="Swipe left or right to view different images"
-        >
+            ref={pagerRef}
+            style={styles.pagerView} 
+            initialPage={0}
+            onPageSelected={onPageSelected}
+            accessible={true}
+            accessibilityLabel={`Gallerie mit ${images.length} Bildern`}
+            accessibilityHint="Wische nach links oder rechts für weitere Bilder"
+          >
           {images.map((image, index) => (
             <View 
               key={index} 
               style={styles.page}
               accessible={true}
-              accessibilityLabel={`Image ${index + 1} of ${images.length}`}
-              accessibilityHint={image?.description || 'No description available'}
+              accessibilityLabel={`Bild ${index + 1} von ${images.length}`}
+              accessibilityHint={image?.description || 'Keine Beschreibung verfügbar'}
             >
               <Image
                 style={styles.image}
@@ -78,7 +102,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                 contentFit="cover"
                 transition={1000}
                 accessible={true}
-                accessibilityLabel={image?.description || 'No description available'}
+                accessibilityLabel={image?.description || 'Keine Beschreibung verfügbar'}
               />
             </View>
           ))}
@@ -86,8 +110,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
         <View 
           style={styles.indicatorContainer}
           accessible={true}
-          accessibilityLabel={`Image ${currentPage + 1} of ${images.length}`}
-          accessibilityHint="Shows current image position"
+          accessibilityLabel={`Bild ${currentPage + 1} von ${images.length}`}
+          accessibilityHint="Zeigt aktuelle Bildposition"
         >
           <Text style={styles.pageText}>
             {currentPage + 1} / {images.length}
@@ -108,10 +132,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
           <Text 
             style={styles.swipeHint}
             accessible={true}
-            accessibilityLabel="Swipe hint"
-            accessibilityHint="Swipe right to view more images"
+            accessibilityLabel="Wisch Hinweis"
+            accessibilityHint="Wische rechts für mehr Bilder"
           >
-            Swipe für mehr Bilder ➡️
+            Wische für mehr Bilder ⬅️
           </Text>
         )}
       </View>

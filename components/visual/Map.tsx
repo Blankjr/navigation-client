@@ -220,7 +220,10 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
 
       {initialGuideData && (
   <>
-    <ImageGallery images={relevantWaypoints} />
+    <ImageGallery 
+            images={relevantWaypoints} 
+            currentGridSquare={currentGridSquare} 
+        />
     <View style={styles.controlsRow}>
       <View style={styles.controlHalf}>
         <SignInfo signage={getEffectiveSignage} />
