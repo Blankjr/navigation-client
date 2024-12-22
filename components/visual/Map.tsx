@@ -229,7 +229,7 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
         <SignInfo signage={getEffectiveSignage} />
       </View>
       <View style={styles.controlHalf}>
-        <NavigationAudioGuide images={relevantWaypoints}/>
+        <NavigationAudioGuide images={relevantWaypoints} autoPlay={true}/>
       </View>
     </View>
   </>
