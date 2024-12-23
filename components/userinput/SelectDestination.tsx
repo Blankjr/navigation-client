@@ -10,10 +10,24 @@ interface SelectDestinationProps {
 
 const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
   const [selectedLocation, setSelectedLocation] = React.useState<Location | null>(null);
+  const [selectionTimestamp, setSelectionTimestamp] = React.useState<number>(0);
+
+  const forceUpdate = React.useCallback(() => {
+    setSelectionTimestamp(Date.now());
+  }, []);
 
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
+    setSelectionTimestamp(Date.now());
     onSearch(location);
+  };
+
+  const handleConfirmPress = () => {
+    if (selectedLocation) {
+      Keyboard.dismiss();
+      setSelectionTimestamp(Date.now());
+      onSearch(selectedLocation);
+    }
   };
 
   const calculateFontSize = (text: string, baseSize: number) => {
@@ -56,10 +70,7 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
         <Button
           icon="map-marker-radius"
           mode="contained"
-          onPress={() => {
-            Keyboard.dismiss();
-            selectedLocation && handleLocationSelect(selectedLocation)}
-          }
+          onPress={handleConfirmPress}
           style={styles.confirmButton}
           labelStyle={styles.buttonLabel}
           disabled={!selectedLocation}
@@ -71,7 +82,7 @@ const SelectDestination: React.FC<SelectDestinationProps> = ({ onSearch }) => {
           Zum Ziel
         </Button>
 
-        <EnhancedLocationSelector onLocationSelect={handleLocationSelect} />
+        <EnhancedLocationSelector onLocationSelect={handleLocationSelect} forceUpdate={forceUpdate}/>
       </View>
     </SafeAreaView>
   );

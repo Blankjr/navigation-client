@@ -143,14 +143,14 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
 
   // Fetch guide data when position is available and we don't have guide data yet
   React.useEffect(() => {
-    if (currentGridSquare && destinationRoom && !initialGuideData) {
+    if (currentGridSquare && destinationRoom) {
       fetchInitialGuideData(currentGridSquare, destinationRoom, isVisualMode)
         .then(data => {
           setInitialGuideData(data);
         })
         .catch(error => console.error('Failed to fetch guide data:', error));
     }
-  }, [currentGridSquare, destinationRoom, initialGuideData]);
+  }, [currentGridSquare, destinationRoom, isVisualMode]);
 
   // Initial speech when component mounts or destination changes
   React.useEffect(() => {

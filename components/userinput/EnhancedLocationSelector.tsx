@@ -27,9 +27,10 @@ const allLocations = [...locations, ...generateRoomNumbers()];
 
 interface EnhancedLocationSelectorProps {
   onLocationSelect: (location: Location) => void;
+  forceUpdate?: () => void;
 }
 
-const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onLocationSelect }) => {
+const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onLocationSelect, forceUpdate }) => {
   const { isVisualMode } = useNavigationStore();
   const [isListening, setIsListening] = useState<boolean>(false);
   const [results, setResults] = useState<string[]>([]);
@@ -199,6 +200,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
   const handleLocationPress = (location: Location) => {
     setSearchQuery(location.name);
     setShowDropdown(false);
+    if (forceUpdate) forceUpdate();
     onLocationSelect(location);
   };
 
