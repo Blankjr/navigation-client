@@ -16,10 +16,10 @@ const generateRoomNumbers = () => {
     return {
       id: `room-${paddedNum}`,
       name: `Raum ${num}`,
-      type: 'room',
+      type: 'room' as const,
       room: `04.2.${paddedNum}`,
       aliases: [num]
-    };
+    } satisfies Location; 
   });
 };
 
@@ -144,7 +144,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
 
   const findMatch = (spokenText: string) => {
     const normalizedInput = spokenText.toLowerCase().trim();
-    let bestMatch = null;
+    let bestMatch: Location | null = null;
     let bestMatchScore = 0;
   
     allLocations.forEach(location => {
@@ -158,14 +158,15 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
   
       if (currentBestScore > bestMatchScore) {
         bestMatchScore = currentBestScore;
-        bestMatch = location;
+        bestMatch = location as Location;
       }
     });
   
     if (bestMatch && bestMatchScore > 0.65) {
-      setSearchQuery(bestMatch.name);
+      const match: Location = bestMatch;
+      setSearchQuery(match.name);
       setMatchConfidence(Math.round(bestMatchScore * 100));
-      onLocationSelect(bestMatch);
+      onLocationSelect(match);
     } else {
       setError('Ziel nicht erkannt. Bitte wiederholen');
       setMatchConfidence(null);
