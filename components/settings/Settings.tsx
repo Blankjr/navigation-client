@@ -1,56 +1,35 @@
-// import React from 'react'
-// import { View, StyleSheet } from 'react-native'
-// import { Switch, Subheading, DefaultTheme } from 'react-native-paper'
-// // import { useStateValue } from '../Store'
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     elevation: 2,
-//     padding: 16,
-//   },
-//   row: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//     paddingTop: 16,
-//     paddingHorizontal: 16,
-//     width: '100%',
-//   },
-// })
-// function SettingsScreen() {
-// //   const [state, dispatch] = useStateValue()
-// //   const { isDarkModeOn } = state
-// //   const handleThemeChange = () => dispatch({
-// //     type: 'TOGGLE_THEME',
-// //     payload: !isDarkModeOn,
-// //   })
-//   return (
-//     <View >
-//       <View style={styles.row}>
-//         <Subheading >Rot Grün Schwäche</Subheading>
-//         {/* <Switch value={isDarkModeOn} onValueChange={handleThemeChange} /> */}
-//       </View>
-//     </View>
-//   )
-// }
-// export default SettingsScreen
-
-
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Switch } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
 import { useAudioStore } from '../../stores/useAudioStore';
+import { useNavigationStore } from '../../stores/useNavigationStore';
 
 const Settings: React.FC = () => {
   const { speechRate, setSpeechRate } = useAudioStore();
+  const { isVisualMode, setVisualMode } = useNavigationStore();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
+    <View 
+      style={styles.container}
+      accessible={true}
+      accessibilityLabel="Einstellungen"
+      accessibilityRole="menu"
+    >
+      <Text 
+        style={styles.title}
+        accessibilityRole="header"
+      >
         Sprache
       </Text>
-      <View style={styles.sliderContainer}>
+      
+      <View 
+        style={styles.sliderContainer}
+        accessible={true}
+        accessibilityRole="adjustable"
+        accessibilityLabel={`Sprechgeschwindigkeit: ${speechRate.toFixed(1)}x`}
+        accessibilityHint="Ziehen Sie den Schieberegler nach links für langsamere oder nach rechts für schnellere Sprachausgabe"
+      >
         <Text style={styles.sliderLabel}>
           Geschwindigkeit: {speechRate.toFixed(1)}x
         </Text>
@@ -65,6 +44,50 @@ const Settings: React.FC = () => {
           maximumTrackTintColor="#000000"
           thumbTintColor="#0052CC"
         />
+      </View>
+
+      <View 
+        style={styles.switchContainer}
+        accessible={true}
+        accessibilityRole="radiogroup"
+        accessibilityLabel="Navigationsmodus Auswahl"
+      >
+        <Text 
+          style={styles.switchLabel}
+          accessibilityRole="header"
+        >
+          Navigationsmodus
+        </Text>
+        <View 
+          style={styles.switchRow}
+          accessibilityRole="radio"
+          accessibilityState={{ checked: !isVisualMode }}
+          accessibilityHint="Wechselt zwischen taktilem und visuellem Navigationsmodus"
+        >
+          <Text 
+            style={[
+              styles.modeText,
+              !isVisualMode && styles.activeText
+            ]}
+          >
+            Taktil
+          </Text>
+          <Switch
+            value={isVisualMode}
+            onValueChange={setVisualMode}
+            color="#0052CC"
+            accessibilityLabel={`${isVisualMode ? 'Visueller' : 'Taktiler'} Modus ist aktiv`}
+            accessibilityHint="Doppeltippen zum Umschalten des Navigationsmodus"
+          />
+          <Text 
+            style={[
+              styles.modeText,
+              isVisualMode && styles.activeText
+            ]}
+          >
+            Visuell
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -86,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sliderLabel: {
-    fontSize: 24,
+    fontSize: 28,
     marginBottom: 12,
     color: '#000',
   },
@@ -95,6 +118,28 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 40,
   },
+  switchContainer: {
+    marginTop: 24,
+  },
+  switchLabel: {
+    fontSize: 32,
+    marginBottom: 12,
+    color: '#000',
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+  },
+  modeText: {
+    fontSize: 28,
+    color: '#666',
+  },
+  activeText: {
+    color: '#0052CC',
+    fontWeight: '600',
+  }
 });
 
 export default Settings;
