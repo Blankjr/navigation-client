@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
-import { Searchbar, List } from 'react-native-paper';
+import { Searchbar, List, Icon } from 'react-native-paper';
 import Voice from '@react-native-voice/voice';
 import { locations, Location } from '../../data/locations';
 import { complexNames } from '../../data/complexNames';
 import * as Speech from 'expo-speech';
 import { useAudioStore } from '@/stores/useAudioStore';
+import { useNavigationStore } from '@/stores/useNavigationStore';
 
 // Generate room numbers from 1 to 40 with simple aliases
 const generateRoomNumbers = () => {
@@ -29,6 +30,7 @@ interface EnhancedLocationSelectorProps {
 }
 
 const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onLocationSelect }) => {
+  const { isVisualMode } = useNavigationStore();
   const [isListening, setIsListening] = useState<boolean>(false);
   const [results, setResults] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -231,64 +233,102 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
   };
 
   return (
-  <View style={styles.container}>
-  <View style={styles.searchContainer}>
-    <Searchbar
-      placeholder="Raum oder Name"
-      onChangeText={handleSearch}
-      value={searchQuery}
-      style={styles.searchBar}
-      inputStyle={styles.searchBarInput}
-      iconColor="#0052CC"
-      placeholderTextColor="#666666"
-    />
-    
-    {showDropdown && filteredLocations.length > 0 && (
-      <View style={styles.dropdown}>
-        <FlatList
-          data={filteredLocations}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <List.Item
-              title={item.name}
-              titleStyle={styles.dropdownItemText}
-              onPress={() => handleLocationPress(item)}
-              style={styles.dropdownItem}
-            />
+    <View style={[
+      styles.container,
+      !isVisualMode && styles.tactileContainer
+    ]}>
+      {isVisualMode && (
+        <View style={styles.searchContainer}>
+          <Searchbar
+            placeholder="Raum oder Name"
+            onChangeText={handleSearch}
+            value={searchQuery}
+            style={styles.searchBar}
+            inputStyle={styles.searchBarInput}
+            iconColor="#0052CC"
+            placeholderTextColor="#666666"
+          />
+          
+          {showDropdown && filteredLocations.length > 0 && (
+            <View style={styles.dropdown}>
+              <FlatList
+                data={filteredLocations}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <List.Item
+                    title={item.name}
+                    titleStyle={styles.dropdownItemText}
+                    onPress={() => handleLocationPress(item)}
+                    style={styles.dropdownItem}
+                  />
+                )}
+                style={styles.dropdownList}
+              />
+            </View>
           )}
-          style={styles.dropdownList}
-        />
+        </View>
+      )}
+
+      <View style={[
+        styles.voiceContainer,
+        !isVisualMode && styles.tactileVoiceContainer
+      ]}>
+        <TouchableOpacity
+          style={[
+            styles.voiceButton,
+            isListening && styles.buttonListening,
+            !isVisualMode && styles.tactileVoiceButton
+          ]}
+          onPress={isListening ? stopListening : startListening}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={isListening ? "Sprachaufnahme stoppen" : "Sprachaufnahme starten"}
+          accessibilityHint={isListening ? "Beendet die Aufnahme" : "Startet die Sprachaufnahme zur Zielauswahl"}
+        >
+          <Text style={[
+            styles.buttonText,
+            !isVisualMode && styles.tactileButtonText
+          ]}>
+            {isListening ? (
+              <Icon source="stop" size={!isVisualMode ? 120 : 80} color="#FFFFFF" />
+            ) : (
+              <Icon source="microphone" size={!isVisualMode ? 120 : 80} color="#FFFFFF" />
+            )}
+          </Text>
+        </TouchableOpacity>
+
+        {isListening && (
+          <Text style={[
+            styles.listeningText,
+            !isVisualMode && styles.tactileListeningText
+          ]}>
+            am hören...
+          </Text>
+        )}
+        
+        {error !== '' && (
+          <Text style={[
+            styles.errorText,
+            !isVisualMode && styles.tactileErrorText
+          ]}>
+            {error}
+          </Text>
+        )}
       </View>
-    )}
-  </View>
-
-  <View style={styles.voiceContainer}>
-    <TouchableOpacity
-      style={[styles.voiceButton, isListening && styles.buttonListening]}
-      onPress={isListening ? stopListening : startListening}
-    >
-      <Text style={styles.buttonText}>
-        {isListening ? 'Stop' : 'Sprachsuche'}
-      </Text>
-    </TouchableOpacity>
-
-    {isListening && (
-      <Text style={styles.listeningText}>am hören...</Text>
-    )}
-    
-    {error !== '' && (
-      <Text style={styles.errorText}>{error}</Text>
-    )}
-  </View>
-</View>
+    </View>
   );
 };
 
 const screenHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  tactileContainer: {
+    padding: 10,
+    justifyContent: 'center',
   },
   searchContainer: {
     position: 'relative',
@@ -339,6 +379,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
     alignItems: 'center',
   },
+  tactileVoiceContainer: {
+    marginTop: 0,
+    flex: 1,
+    justifyContent: 'center',
+  },
   voiceButton: {
     backgroundColor: '#0052CC',
     padding: 40,
@@ -348,6 +393,11 @@ const styles = StyleSheet.create({
     minHeight: 180,
     justifyContent: 'center',
   },
+  tactileVoiceButton: {
+    minHeight: 300,
+    borderWidth: 4,
+    borderColor: '#003380',
+  },
   buttonListening: {
     backgroundColor: '#DC2626',
   },
@@ -356,6 +406,9 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
   },
+  tactileButtonText: {
+    fontSize: 48,
+  },
   listeningText: {
     marginTop: 24,
     fontSize: 24,
@@ -363,12 +416,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
   },
+  tactileListeningText: {
+    fontSize: 36,
+    marginTop: 32,
+  },
   errorText: {
     marginTop: 16,
     color: '#DC2626',
     textAlign: 'center',
     fontSize: 24,
     fontWeight: '500',
+  },
+  tactileErrorText: {
+    fontSize: 36,
+    marginTop: 32,
   },
 });
 
