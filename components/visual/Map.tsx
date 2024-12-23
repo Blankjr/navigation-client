@@ -10,6 +10,7 @@ import LineIndicator from './LineIndicator';
 import SignInfo from './SignInfo';
 import { findSignageByRoom, Location, locations, RoomSignage, SignColor } from '../../data/locations';
 import { useAudioStore } from '@/stores/useAudioStore';
+import { useNavigationStore } from '@/stores/useNavigationStore';
 interface MapProps {
   selectedLocation: Location | null;
 }
@@ -27,7 +28,6 @@ const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.a
 const fetchPositionData = async () => {
   try {
     const url = `${API_URL}/simulatedPosition/gridSquare/`;
-    console.log('Fetching from:', url);
     
     const response = await fetch(url, {
       headers: {
@@ -43,7 +43,6 @@ const fetchPositionData = async () => {
     }
     
     const data = await response.json();
-    console.log('Received data:', data);
     return data;
   } catch (error) {
     console.error('Fetch error:', error);
@@ -51,11 +50,13 @@ const fetchPositionData = async () => {
   }
 };
 
-const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: string) => {
+const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: string, mode: boolean) => {
   try {
     destinationRoom = destinationRoom.replace(/\s+/g, '-');
-    const url = `${API_URL}/guide/?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`;
+    console.log(mode);
     
+    const url = `${API_URL}/guide/?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=${mode ? 'visual' : 'tactile'}`;
+    console.log(url);
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
@@ -79,12 +80,6 @@ const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: s
     return responseBody;
   } catch (error) {
     console.error('Guide data fetch error:', error);
-    // Log the parameters to help debug
-    // console.log('Guide data parameters:', {
-    //   startGridSquare,
-    //   destinationRoom,
-    //   fullUrl: `${API_URL}/guide/?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=visual`
-    // });
     throw error;
   }
 };
@@ -105,6 +100,7 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
   const [initialGuideData, setInitialGuideData] = React.useState<GuideData | null>(null);
   const speechRate = useAudioStore((state) => state.speechRate);
+  const  isVisualMode = useNavigationStore();
   // Get destination room from selectedLocation
   const destinationRoom = selectedLocation?.room || selectedLocation?.name?.toLowerCase() || '';
   const lastDestinationRef = React.useRef(destinationRoom);
@@ -148,7 +144,7 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
   // Fetch guide data when position is available and we don't have guide data yet
   React.useEffect(() => {
     if (currentGridSquare && destinationRoom && !initialGuideData) {
-      fetchInitialGuideData(currentGridSquare, destinationRoom)
+      fetchInitialGuideData(currentGridSquare, destinationRoom, isVisualMode)
         .then(data => {
           setInitialGuideData(data);
         })
