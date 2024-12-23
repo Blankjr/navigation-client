@@ -297,23 +297,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
           </Text>
         </TouchableOpacity>
 
-        {isListening && (
-          <Text style={[
-            styles.listeningText,
-            !isVisualMode && styles.tactileListeningText
-          ]}>
-            am hören...
-          </Text>
-        )}
-        
-        {error !== '' && (
-          <Text style={[
-            styles.errorText,
-            !isVisualMode && styles.tactileErrorText
-          ]}>
-            {error}
-          </Text>
-        )}
+
       </View>
     </View>
   );
@@ -401,35 +385,8 @@ const styles = StyleSheet.create({
   buttonListening: {
     backgroundColor: '#DC2626',
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 32,
-    fontWeight: 'bold',
-  },
-  tactileButtonText: {
-    fontSize: 48,
-  },
-  listeningText: {
-    marginTop: 24,
-    fontSize: 24,
-    color: '#DC2626',
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  tactileListeningText: {
-    fontSize: 36,
-    marginTop: 32,
-  },
-  errorText: {
-    marginTop: 16,
-    color: '#DC2626',
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: '500',
-  },
-  tactileErrorText: {
-    fontSize: 36,
-    marginTop: 32,
+  buttonIcon: {
+    alignSelf: 'center',
   },
 });
 
