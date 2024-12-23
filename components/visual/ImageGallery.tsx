@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, View, Dimensions, Text, AccessibilityInfo } from 'react-native';
+import { StyleSheet, View, Dimensions, Text, AccessibilityInfo, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { Image } from 'expo-image';
 import PagerView from 'react-native-pager-view';
 import { create } from 'zustand';
@@ -141,7 +141,22 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, currentGridSquare }
   );
 };
 
-const styles = StyleSheet.create({
+interface Styles {
+  container: ViewStyle;
+  pagerView: ViewStyle;
+  page: ViewStyle;
+  image: ImageStyle;
+  indexContainer: ViewStyle;
+  indexText: TextStyle;
+  indicatorContainer: ViewStyle;
+  pageText: TextStyle;
+  dotContainer: ViewStyle;
+  dot: ViewStyle;
+  activeDot: ViewStyle;
+  inactiveDot: ViewStyle;
+}
+
+const styles = StyleSheet.create<Styles>({
   container: {
       height: Dimensions.get('window').height * 0.3,
       width: '100%',
@@ -158,7 +173,7 @@ const styles = StyleSheet.create({
       flex: 1,
       width: '100%',
       backgroundColor: '#0553',
-  },
+  } as ImageStyle,
   indexContainer: {
       flex: 1,
       width: '100%',
@@ -185,10 +200,10 @@ const styles = StyleSheet.create({
       paddingHorizontal: 20,
   },
   pageText: {
-      color: isVisualMode => isVisualMode ? 'white' : '#000000',
+      color: 'white',
       fontSize: 16,
       fontWeight: 'bold',
-      textShadowColor: isVisualMode => isVisualMode ? 'rgba(0, 0, 0, 0.75)' : 'transparent',
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
       textShadowOffset: {width: -1, height: 1},
       textShadowRadius: 10,
   },
@@ -202,10 +217,10 @@ const styles = StyleSheet.create({
       marginHorizontal: 4,
   },
   activeDot: {
-      backgroundColor: isVisualMode => isVisualMode ? 'white' : '#0052CC',
+      backgroundColor: 'white',
   },
   inactiveDot: {
-      backgroundColor: isVisualMode => isVisualMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 82, 204, 0.3)',
+      backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
 });
 
