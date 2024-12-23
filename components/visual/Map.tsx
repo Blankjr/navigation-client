@@ -53,10 +53,8 @@ const fetchPositionData = async () => {
 const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: string, mode: boolean) => {
   try {
     destinationRoom = destinationRoom.replace(/\s+/g, '-');
-    console.log(mode);
     
     const url = `${API_URL}/guide/?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=${mode ? 'visual' : 'tactile'}`;
-    console.log(url);
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
@@ -76,7 +74,6 @@ const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: s
     }
     
     const responseBody = await response.json();
-    console.log("Guide data received:", responseBody);
     return responseBody;
   } catch (error) {
     console.error('Guide data fetch error:', error);
