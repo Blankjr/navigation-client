@@ -100,7 +100,7 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
   const [initialGuideData, setInitialGuideData] = React.useState<GuideData | null>(null);
   const speechRate = useAudioStore((state) => state.speechRate);
-  const  isVisualMode = useNavigationStore();
+  const  { isVisualMode } = useNavigationStore();
   // Get destination room from selectedLocation
   const destinationRoom = selectedLocation?.room || selectedLocation?.name?.toLowerCase() || '';
   const lastDestinationRef = React.useRef(destinationRoom);
