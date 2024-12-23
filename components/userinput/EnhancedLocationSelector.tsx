@@ -285,10 +285,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
           accessibilityLabel={isListening ? "Sprachaufnahme stoppen" : "Sprachaufnahme starten"}
           accessibilityHint={isListening ? "Beendet die Aufnahme" : "Startet die Sprachaufnahme zur Zielauswahl"}
         >
-          <Text style={[
-            styles.buttonText,
-            !isVisualMode && styles.tactileButtonText
-          ]}>
+          <Text>
             {isListening ? (
               <Icon source="stop" size={!isVisualMode ? 120 : 80} color="#FFFFFF" />
             ) : (
