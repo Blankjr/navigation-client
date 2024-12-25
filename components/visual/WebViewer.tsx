@@ -22,7 +22,17 @@ const ROOM_DESTINATIONS = {
   'labor': [
     '04.2.014',
     '04.2.015',
-    '04.2.016'
+    '04.2.016',
+    'Labor Interaktive Systeme',
+    'Labor Mixed Reality',
+    'Labor Computergrafik',
+    'Labor IT Sicherheit',
+    'Labor Multimedia Kommunikation',
+    'Labor Webtechnologie',
+    'Labor Digitaltechnik',
+    'Labor Datenbanken',
+    'Labor AV Produktion',
+    'Labor Mediengestaltung'
   ],
   'seminarraum': [
     '04.2.017',
@@ -31,14 +41,20 @@ const ROOM_DESTINATIONS = {
   'sitzungsraum': [
     '04.2.025'
   ],
-  'fachschaft': ['fachschaft'],
-  'pc-pool': ['pc-pool',]
+  'fachschaft': 
+  [
+    'fachschaft'
+  ],
+  'pc-pool': [
+    'pc-pool', 
+    '04.2.028'
+  ]
 } as const;
 
 // Create a lookup map for faster room resolution
 const ROOM_LOOKUP = Object.entries(ROOM_DESTINATIONS).reduce((acc, [destination, rooms]) => {
   rooms.forEach(room => {
-    acc[room] = destination;
+    acc[room.toLowerCase()] = destination;
   });
   return acc;
 }, {} as { [key: string]: string });
@@ -46,20 +62,26 @@ const ROOM_LOOKUP = Object.entries(ROOM_DESTINATIONS).reduce((acc, [destination,
 const WebViewer: React.FC<WebViewerProps> = ({ isVisible, onClose, destinationRoom }) => {
   const getFormattedUrl = (room: string): string => {
     const baseUrl = ROOM_INFO_WEBSITE_URL;
+    const lowercaseRoom = room.toLowerCase();
+    
+    // Check if room starts with "labor" - if so, use generic labor page
+    if (lowercaseRoom.startsWith('labor ')) {
+      return `${baseUrl}labor`;
+    }
     
     // Check if room has a special mapping
-    if (room in ROOM_LOOKUP) {
-      return `${baseUrl}/${ROOM_LOOKUP[room]}`;
+    if (lowercaseRoom in ROOM_LOOKUP) {
+      return `${baseUrl}${ROOM_LOOKUP[lowercaseRoom]}`;
     }
     
     // Handle regular room numbers
     if (room.match(/^\d{2}\.\d\.\d{3}$/)) {
-      return `${baseUrl}/${room}`;
+      return `${baseUrl}${room}`;
     }
     
     // Clean the room string for other cases
-    const cleanRoom = room.replace(/\s+/g, '-');
-    return `${baseUrl}/${cleanRoom}`;
+    const cleanRoom = room.toLowerCase().replace(/\s+/g, '-');
+    return `${baseUrl}${cleanRoom}`;
   };
 
   return (
