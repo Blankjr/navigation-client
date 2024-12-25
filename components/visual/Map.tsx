@@ -11,6 +11,7 @@ import SignInfo from './SignInfo';
 import { findSignageByRoom, Location, locations, RoomSignage, SignColor } from '../../data/locations';
 import { useAudioStore } from '@/stores/useAudioStore';
 import { useNavigationStore } from '@/stores/useNavigationStore';
+import { updateFingerprintDatabase, getCurrentPosition } from '../utils/fingerprinting';
 interface MapProps {
   selectedLocation: Location | null;
 }
@@ -25,10 +26,17 @@ interface GuideData {
 // const API_URL = 'http://192.168.1.109:3000';
 const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app'
 
-const fetchPositionData = async () => {
+const fetchPositionData = async (isWlanFingerprinting: boolean) => {
+  if (isWlanFingerprinting) {
+    const position = await getCurrentPosition();
+    if (!position) {
+      throw new Error('Failed to get position from WLAN fingerprinting');
+    }
+    return position;
+  }
+
   try {
     const url = `${API_URL}/simulatedPosition/gridSquare/`;
-    
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
@@ -42,8 +50,7 @@ const fetchPositionData = async () => {
       throw new Error(`Failed to fetch position data: ${response.status}`);
     }
     
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Fetch error:', error);
     throw error;
@@ -97,7 +104,7 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
   const [currentGridSquare, setCurrentGridSquare] = React.useState<string>('');
   const [initialGuideData, setInitialGuideData] = React.useState<GuideData | null>(null);
   const speechRate = useAudioStore((state) => state.speechRate);
-  const  { isVisualMode } = useNavigationStore();
+  const { isVisualMode, isWlanFingerprinting } = useNavigationStore();
   // Get destination room from selectedLocation
   const destinationRoom = selectedLocation?.room || selectedLocation?.name?.toLowerCase() || '';
   const lastDestinationRef = React.useRef(destinationRoom);
@@ -126,15 +133,22 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
     }
   }, [destinationRoom]);
 
+  React.useEffect(() => {
+    if (isWlanFingerprinting) {
+      updateFingerprintDatabase().catch(console.error);
+    }
+  }, [isWlanFingerprinting]);
+
   // Get current position with grid square
-  const { data: positionData } = useQuery(
-    'positionData',
-    fetchPositionData,
+  const { data: positionData, isLoading } = useQuery(
+    ['positionData', isWlanFingerprinting],
+    () => fetchPositionData(isWlanFingerprinting),
     {
-      refetchInterval: 5000,
+      refetchInterval: isWlanFingerprinting ? 20000 : 5000, // Longer interval for WLAN mode
       onSuccess: (data) => {
         setCurrentGridSquare(data.gridSquare);
       },
+      retry: 3,
     }
   );
 
