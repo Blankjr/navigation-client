@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Modal, SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { IconButton } from 'react-native-paper';
+import { ROOM_INFO_WEBSITE_URL } from '@/constants/Config';
 
 interface WebViewerProps {
   isVisible: boolean;
@@ -44,7 +45,7 @@ const ROOM_LOOKUP = Object.entries(ROOM_DESTINATIONS).reduce((acc, [destination,
 
 const WebViewer: React.FC<WebViewerProps> = ({ isVisible, onClose, destinationRoom }) => {
   const getFormattedUrl = (room: string): string => {
-    const baseUrl = 'https://www.freibewegen.info/rooms';
+    const baseUrl = ROOM_INFO_WEBSITE_URL;
     
     // Check if room has a special mapping
     if (room in ROOM_LOOKUP) {

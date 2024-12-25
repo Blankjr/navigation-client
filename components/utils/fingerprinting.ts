@@ -1,6 +1,7 @@
 import TetheringManager from '@react-native-tethering/wifi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform, PermissionsAndroid, ToastAndroid } from 'react-native';
+import { SERVER_API_URL } from '@/constants/Config';
 
 interface WifiSample {
   ssid: string;
@@ -45,7 +46,7 @@ interface FingerprintDatabase {
 }
 
 const STORAGE_KEY = '@fingerprint_db';
-const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app/fingerprints';
+const API_URL = `${SERVER_API_URL}fingerprints`;
 
 const DEFAULT_POSITION = {
   gridSquare: '04.0.H3-P7',

@@ -12,6 +12,7 @@ import { findSignageByRoom, Location, locations, RoomSignage, SignColor } from '
 import { useAudioStore } from '@/stores/useAudioStore';
 import { useNavigationStore } from '@/stores/useNavigationStore';
 import { updateFingerprintDatabase, getCurrentPosition } from '../utils/fingerprinting';
+import { SERVER_API_URL } from '@/constants/Config';
 interface MapProps {
   selectedLocation: Location | null;
 }
@@ -23,8 +24,7 @@ interface GuideData {
   route: any[];
 }
 
-// const API_URL = 'http://192.168.1.109:3000';
-const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app'
+const API_URL = SERVER_API_URL
 
 const fetchPositionData = async (isWlanFingerprinting: boolean) => {
   if (isWlanFingerprinting) {
@@ -36,7 +36,7 @@ const fetchPositionData = async (isWlanFingerprinting: boolean) => {
   }
 
   try {
-    const url = `${API_URL}/simulatedPosition/gridSquare/`;
+    const url = `${API_URL}simulatedPosition/gridSquare/`;
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
@@ -61,7 +61,7 @@ const fetchInitialGuideData = async (startGridSquare: string, destinationRoom: s
   try {
     destinationRoom = destinationRoom.replace(/\s+/g, '-');
     
-    const url = `${API_URL}/guide/?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=${mode ? 'visual' : 'tactile'}`;
+    const url = `${API_URL}guide/?start_gridsquare=${startGridSquare}&destination_room=${destinationRoom}&mode=${mode ? 'visual' : 'tactile'}`;
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
