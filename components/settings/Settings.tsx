@@ -7,7 +7,12 @@ import { useNavigationStore } from '../../stores/useNavigationStore';
 
 const Settings: React.FC = () => {
   const { speechRate, setSpeechRate } = useAudioStore();
-  const { isVisualMode, setVisualMode } = useNavigationStore();
+  const { 
+    isVisualMode, 
+    setVisualMode,
+    isWlanFingerprinting,
+    setWlanFingerprinting 
+  } = useNavigationStore();
 
   return (
     <View 
@@ -89,6 +94,35 @@ const Settings: React.FC = () => {
           </Text>
         </View>
       </View>
+
+      <View 
+        style={[styles.switchContainer, styles.experimentalContainer]}
+        accessible={true}
+        accessibilityRole="switch"
+        accessibilityLabel="WLAN Fingerprinting experimenteller Modus"
+      >
+        <Text 
+          style={styles.switchLabel}
+          accessibilityRole="header"
+        >
+          Experimentell
+        </Text>
+        <View 
+          style={styles.switchRow}
+          accessibilityHint="Aktiviert oder deaktiviert WLAN Fingerprinting zur Positionsbestimmung"
+        >
+          <Text style={styles.experimentalLabel}>
+            WLAN Fingerprinting
+          </Text>
+          <Switch
+            value={isWlanFingerprinting}
+            onValueChange={setWlanFingerprinting}
+            color="#0052CC"
+            accessibilityLabel={`WLAN Fingerprinting ist ${isWlanFingerprinting ? 'aktiviert' : 'deaktiviert'}`}
+            accessibilityHint="Doppeltippen zum Umschalten von WLAN Fingerprinting"
+          />
+        </View>
+      </View>
     </View>
   );
 };
@@ -121,6 +155,9 @@ const styles = StyleSheet.create({
   switchContainer: {
     marginTop: 24,
   },
+  experimentalContainer: {
+    marginTop: 48,
+  },
   switchLabel: {
     fontSize: 32,
     marginBottom: 12,
@@ -133,6 +170,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   modeText: {
+    fontSize: 28,
+    color: '#666',
+  },
+  experimentalLabel: {
     fontSize: 28,
     color: '#666',
   },
