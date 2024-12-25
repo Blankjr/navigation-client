@@ -51,12 +51,6 @@ export const locations: Location[] = [
     }
   },
   {
-    id: '2',
-    name: 'Serverraum',
-    type: 'facility',
-    aliases: ['server raum', 'server']
-  },
-  {
     id: '3',
     name: 'Toilette',
     type: 'facility',

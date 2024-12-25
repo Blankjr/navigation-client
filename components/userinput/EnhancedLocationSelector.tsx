@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Platform, KeyboardAvoidingView } from 'react-native';
 import { Searchbar, List, Icon } from 'react-native-paper';
 import Voice from '@react-native-voice/voice';
 import { locations, Location } from '../../data/locations';
@@ -242,15 +242,20 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
     ]}>
       {isVisualMode && (
         <View style={styles.searchContainer}>
-          <Searchbar
-            placeholder="Raum oder Name"
-            onChangeText={handleSearch}
-            value={searchQuery}
-            style={styles.searchBar}
-            inputStyle={styles.searchBarInput}
-            iconColor="#0052CC"
-            placeholderTextColor="#666666"
-          />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
+            <Searchbar
+              placeholder="Raum oder Name"
+              onChangeText={handleSearch}
+              value={searchQuery}
+              style={styles.searchBar}
+              inputStyle={styles.searchBarInput}
+              iconColor="#0052CC"
+              placeholderTextColor="#666666"
+            />
+          </KeyboardAvoidingView>
           
           {showDropdown && filteredLocations.length > 0 && (
             <View style={styles.dropdown}>
@@ -266,6 +271,7 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
                   />
                 )}
                 style={styles.dropdownList}
+                keyboardShouldPersistTaps="handled"
               />
             </View>
           )}
@@ -296,8 +302,6 @@ const EnhancedLocationSelector: React.FC<EnhancedLocationSelectorProps> = ({ onL
             )}
           </Text>
         </TouchableOpacity>
-
-
       </View>
     </View>
   );
@@ -308,7 +312,7 @@ const screenHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    minHeight: 300,
   },
   tactileContainer: {
     padding: 10,
@@ -317,6 +321,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     position: 'relative',
     zIndex: 1,
+    marginBottom: 20,
   },
   searchBar: {
     marginBottom: 16,
@@ -360,8 +365,10 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   voiceContainer: {
-    marginTop: 24,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    minHeight: 200,
   },
   tactileVoiceContainer: {
     marginTop: 0,

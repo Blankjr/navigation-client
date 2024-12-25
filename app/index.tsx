@@ -3,7 +3,7 @@ import { BottomNavigation } from 'react-native-paper';
 import SelectDestination from '@/components/userinput/SelectDestination';
 import Map from '@/components/visual/Map';
 import Settings from '@/components/settings/Settings';
-import { LogBox } from 'react-native';
+import { Keyboard, LogBox } from 'react-native';
 import { Location } from '@/data/locations';
 
 
@@ -24,7 +24,13 @@ export default function Index() {
 
   const handleSearch = (location: Location) => {
     setSelectedLocation(location);
+    Keyboard.dismiss();
     setIndex(1); // Switch to Map
+  };
+
+  const handleIndexChange = (newIndex: number) => {
+    Keyboard.dismiss(); // Dismiss keyboard when switching tabs
+    setIndex(newIndex);
   };
 
   const renderScene = ({ route }: { route: any}) => {
@@ -43,7 +49,7 @@ export default function Index() {
   return (
     <BottomNavigation
       navigationState={{ index, routes }}
-      onIndexChange={setIndex}
+      onIndexChange={handleIndexChange}
       renderScene={renderScene}
       activeColor="#0052CC"
       activeIndicatorStyle={{
