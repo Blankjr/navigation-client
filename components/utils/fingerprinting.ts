@@ -48,11 +48,11 @@ const STORAGE_KEY = '@fingerprint_db';
 const API_URL = 'https://mqtt-hono-context-server-bridge-production.up.railway.app/fingerprints';
 
 const DEFAULT_POSITION = {
-  gridSquare: '04.2.H1-P13',
+  gridSquare: '04.0.H3-P7',
   position: {
-    x: 516,
-    y: 122,
-    floor: '2',
+    x: 577,
+    y: 498,
+    floor: '0',
     timestamp: Date.now()
   },
   timestamp: Date.now()
@@ -133,7 +133,6 @@ export async function updateFingerprintDatabase(): Promise<void> {
     console.log(`Stored ${fingerprints.length} fingerprints`);
   } catch (error) {
     console.warn('Error updating fingerprint database:', error);
-    // Don't store fallback data - keep using existing data if available
   }
 }
 
@@ -184,85 +183,121 @@ async function requestLocationPermission() {
   return true;
 }
 
-export async function getCurrentPosition(): Promise<{
-  gridSquare: string;
-  timestamp: number;
-  position: {
-    x: number;
-    y: number;
-    floor: string;
-    timestamp: number;
-  };
-}> {
-  try {
-    const permissionGranted = await requestLocationPermission();
-    if (!permissionGranted) {
-      ToastAndroid.show('Location permissions are required for WiFi scanning', ToastAndroid.LONG);
-      return DEFAULT_POSITION;
-    }
+function calculateNetworkSimilarity(current: WifiSample[], reference: WifiSample[]): number {
+    let matchScore = 0;
+    let totalWeight = 0;
 
-    const isWifiEnabled = await TetheringManager.isWifiEnabled();
-    if (!isWifiEnabled) {
-      console.log('Enabling WiFi...');
-      await TetheringManager.setWifiEnabled();
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
+    // Create maps for faster lookup
+    const currentMap = new Map(current.map(s => [s.bssid, s]));
+    const referenceMap = new Map(reference.map(s => [s.bssid, s]));
 
-    console.log('Starting network scan...');
-    const networks = await TetheringManager.getWifiNetworks(true);
-    console.log('Found networks:', networks);
+    // Find common networks
+    const commonBssids = new Set([...currentMap.keys()].filter(x => referenceMap.has(x)));
 
-    const currentSamples: WifiSample[] = networks.map(network => ({
-      ssid: network.ssid,
-      rssi: network.level,
-      bssid: network.bssid,
-      frequency: network.frequency
-    }));
+    if (commonBssids.size === 0) return 0;
 
-    const db = await getFingerprintDatabase();
-    if (!db?.fingerprints?.length) {
-      console.warn('No fingerprint database available');
-      return DEFAULT_POSITION;
-    }
-
-    let bestMatch = db.fingerprints[0];
-    let bestScore = Infinity;
-
-    for (const fingerprint of db.fingerprints) {
-      let score = 0;
-      let matchCount = 0;
-
-      for (const currentSample of currentSamples) {
-        const matchingSample = fingerprint.samples.find(s => s.bssid === currentSample.bssid);
-        if (matchingSample) {
-          score += Math.abs(currentSample.rssi - matchingSample.rssi);
-          matchCount++;
-        }
-      }
-
-      // Normalize score by number of matching APs
-      if (matchCount > 0) {
-        score = score / matchCount;
+    for (const bssid of commonBssids) {
+        const currentSample = currentMap.get(bssid)!;
+        const referenceSample = referenceMap.get(bssid)!;
         
-        if (score < bestScore) {
-          bestScore = score;
-          bestMatch = fingerprint;
-        }
-      }
+        // Weight stronger signals more heavily
+        const signalWeight = Math.pow(2, (100 + referenceSample.rssi) / 20);
+        
+        // Calculate similarity based on RSSI difference
+        const rssiDiff = Math.abs(currentSample.rssi - referenceSample.rssi);
+        const similarity = Math.max(0, 1 - (rssiDiff / 40)); // 40dBm difference = 0 similarity
+        
+        matchScore += similarity * signalWeight;
+        totalWeight += signalWeight;
     }
 
-    return {
-      position: {
-        x: bestMatch.position.x,
-        y: bestMatch.position.y,
-        floor: bestMatch.position.floor,
-        timestamp: Date.now()
-      },
-      gridSquare: bestMatch.gridSquare,
-      timestamp: Date.now()
-    };
-  } catch (error) {
-    console.warn('Error in fingerprinting position calculation:', error);
-    return DEFAULT_POSITION;
-  }
+    // Consider the number of matching networks vs total networks
+    const coverageRatio = commonBssids.size / Math.max(current.length, reference.length);
+
+    return (matchScore / totalWeight) * coverageRatio;
 }
+
+export async function getCurrentPosition(): Promise<{
+    gridSquare: string;
+    timestamp: number;
+    position: {
+      x: number;
+      y: number;
+      floor: string;
+      timestamp: number;
+    };
+  }> {
+    try {
+      const permissionGranted = await requestLocationPermission();
+      if (!permissionGranted) {
+        ToastAndroid.show('Location permissions are required for WiFi scanning', ToastAndroid.LONG);
+        return DEFAULT_POSITION;
+      }
+  
+      const isWifiEnabled = await TetheringManager.isWifiEnabled();
+      if (!isWifiEnabled) {
+        console.log('Enabling WiFi...');
+        await TetheringManager.setWifiEnabled();
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+  
+      console.log('Starting network scan...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const networks = await TetheringManager.getWifiNetworks(true);
+      console.log('Found networks:', networks);
+  
+      // Filter out networks with very weak signals
+      const currentSamples: WifiSample[] = networks
+        .filter(network => network.level > -85) // Ignore very weak signals
+        .map(network => ({
+          ssid: network.ssid,
+          rssi: network.level,
+          bssid: network.bssid,
+          frequency: network.frequency
+        }));
+  
+      const db = await getFingerprintDatabase();
+      if (!db?.fingerprints?.length) {
+        console.warn('No fingerprint database available');
+        return DEFAULT_POSITION;
+      }
+  
+      // Calculate similarity scores for each fingerprint
+      const matches = db.fingerprints.map(fingerprint => ({
+        fingerprint,
+        similarity: calculateNetworkSimilarity(currentSamples, fingerprint.samples)
+      }));
+  
+      // Sort by similarity score
+      matches.sort((a, b) => b.similarity - a.similarity);
+  
+      console.log('Top matches:', matches.slice(0, 3).map(m => ({
+        gridSquare: m.fingerprint.gridSquare,
+        similarity: m.similarity,
+        commonNetworks: currentSamples.filter(s => 
+          m.fingerprint.samples.some(fs => fs.bssid === s.bssid)
+        ).length
+      })));
+  
+      // If best match has very low similarity, use default position
+      if (matches[0].similarity < 0.3) {
+        console.log('No good matches found, using default position');
+        return DEFAULT_POSITION;
+      }
+  
+      const bestMatch = matches[0].fingerprint;
+      return {
+        position: {
+          x: bestMatch.position.x,
+          y: bestMatch.position.y,
+          floor: bestMatch.position.floor,
+          timestamp: Date.now()
+        },
+        gridSquare: bestMatch.gridSquare,
+        timestamp: Date.now()
+      };
+    } catch (error) {
+      console.warn('Error in fingerprinting position calculation:', error);
+      return DEFAULT_POSITION;
+    }
+  }

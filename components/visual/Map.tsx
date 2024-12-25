@@ -144,7 +144,7 @@ const Map: React.FC<MapProps> = ({ selectedLocation }) => {
     ['positionData', isWlanFingerprinting],
     () => fetchPositionData(isWlanFingerprinting),
     {
-      refetchInterval: isWlanFingerprinting ? 20000 : 5000, // Longer interval for WLAN mode
+      refetchInterval: isWlanFingerprinting ? 30000 : 3000, // Longer interval for WLAN mode, because Android WlAN access point scanning is ratelimited by the Operating System
       onSuccess: (data) => {
         setCurrentGridSquare(data.gridSquare);
       },
