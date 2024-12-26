@@ -1,65 +1,103 @@
-# Welcome to your Expo app 👋
+# Indoor Navigation Client
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native application providing accessible indoor navigation for people with visual impairments, developed for the Hochschule Düsseldorf.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Dual Navigation Modes**:
+  - Visual mode with high-contrast color guidance
+  - Tactile mode with audio descriptions
+- **Accessibility Features**:
+  - Voice input for destination selection
+  - Adjustable speech rate for audio guidance
+  - High contrast visual elements
+- **Smart Positioning**:
+  - Indoor positioning
+  - Optional WLAN fingerprinting
+- **Room Finding**:
+  - Support for finding rooms, facilities, and staff offices
+  - Smart speech recognition for complex names
+  - Visual and tactile room signage integration
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
-   run dev build now:
-   ```bash
-      npm run dev
-   ```
+- React Native
+- Expo
+- TypeScript
+- React Navigation
+- Zustand for state management
+- React Native Paper for UI components
+- Various Expo modules for device features
 
-   run on android device with local develop build
-   ```bash
-      npx expo run:android
-   ```
-   old:
-   ```bash
-    npx expo start
-   ```
+## Prerequisites
 
+- Node.js (LTS version)
+- npm or yarn
+- Expo CLI
 
-3. Build the app
+## Installation
+
+1. Clone the repository:
 ```bash
-   eas build -p android --local --profile preview
+git clone [repository-url]
 ```
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+2. Install dependencies:
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+3. Install Expo Go on your test device or set up an emulator/simulator
 
-## Learn more
+## Development
 
-To learn more about developing your project with Expo, look at the following resources:
+Start the development server:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+# Start with development configuration
+npm run dev
 
-## Join the community
+# Start on Android device
+npm run android
 
-Join our community of developers creating universal apps.
+# Start on iOS device (requires macOS)
+npm run ios
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Building
+
+To create an APK build:
+
+```bash
+# For Android (local build)
+eas build -p android --local --profile preview
+```
+
+## Project Structure
+
+- `/app` - Main application screens and navigation
+- `/components` - Reusable React components
+- `/data` - Data models and static content
+- `/stores` - Global state management with Zustand
+- `/constants` - Configuration and constants
+
+## Accessibility Features
+
+### Visual Mode
+- High contrast colors for navigation elements
+- Large touch targets
+- Clear visual hierarchy
+- Visual feedback for all interactions
+- Voice support
+
+### Tactile Mode
+- Voice-guided navigation
+- Audio descriptions of surroundings
+- Haptic feedback support
+
+## Configuration
+
+Key settings can be adjusted in the app's settings screen:
+- Speech rate
+- Navigation mode (Visual/Tactile)
+- WLAN fingerprinting mode
