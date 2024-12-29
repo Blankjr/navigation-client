@@ -18,7 +18,7 @@ export default {
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/images/splash.png",
+      image: "./assets/images/icon.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
     },
@@ -27,15 +27,13 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
+        foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff",
       },
-      // package: "com.blankjr.navigationclient",
       package:
       IS_DEV
         ? "com.blankjr.navigationclient.dev"
         : "com.blankjr.navigationclient",
-      // useNextNotificationsApi: IS_DEV,  // Add this line to differentiate behavior
     },
     web: {
       bundler: "metro",
