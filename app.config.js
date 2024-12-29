@@ -1,5 +1,4 @@
 const IS_DEV = process.env.APP_VARIANT === "development";
-const IS_BETA = process.env.APP_VARIANT === "beta";
 const IS_PREVIEW = process.env.APP_VARIANT === "preview";
 
 const APP_NAME = "Freibewegen";
@@ -30,10 +29,11 @@ export default {
         foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff",
       },
-      package:
-      IS_DEV
+      package: IS_DEV 
         ? "com.blankjr.navigationclient.dev"
-        : "com.blankjr.navigationclient",
+        : IS_PREVIEW
+          ? "com.blankjr.navigationclient.preview"
+          : "com.blankjr.navigationclient",
     },
     web: {
       bundler: "metro",
