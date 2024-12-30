@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useColorScheme, View } from "react-native";
 import { MD3LightTheme, PaperProvider, configureFonts } from "react-native-paper";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -162,13 +163,19 @@ const theme = {
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
-      <StatusBar 
-          style="dark"
-          translucent={true}
-        />
+        <View style={{
+            backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
+            paddingTop: 30
+          }}>
+            <StatusBar 
+              style={isDarkMode ? 'light' : 'dark'}
+            />
+        </View>
         <SafeAreaView 
           style={{ 
             flex: 1, 
