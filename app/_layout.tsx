@@ -1,12 +1,9 @@
-import { DarkTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "react-native";
-import { MD3LightTheme, DefaultTheme, PaperProvider, configureFonts } from "react-native-paper";
+import { MD3LightTheme, PaperProvider, configureFonts } from "react-native-paper";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-// Define font configuration for better readability
 const fontConfig = {
   fontFamily: 'System',
   displayLarge: {
@@ -101,7 +98,7 @@ const fontConfig = {
   },
 };
 
-// Define accessible color scheme
+// accessible color scheme
 // These colors meet WCAG 2.1 AA standards for contrast
 const accessibleColors = {
   primary: '#0052CC', // Accessible blue with good contrast
@@ -133,7 +130,6 @@ const accessibleColors = {
   },
 };
 
-// Create accessible theme
 const accessibleTheme = {
   ...MD3LightTheme,
   fonts: configureFonts({config: fontConfig}),
@@ -147,7 +143,7 @@ const accessibleTheme = {
   },
 };
 
-// Add custom properties for spacing consistency
+// custom properties for spacing consistency
 const themeSpacing = {
   spacing: {
     xs: 4,
@@ -166,14 +162,12 @@ const theme = {
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
   return (
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
       <StatusBar 
-          style={isDarkMode ? 'light' : 'dark'}
-          backgroundColor={isDarkMode ? 'rgba(0,0,0,0.8)' : '#FFFFFF'}
+          style="dark"
+          translucent={true}
         />
         <SafeAreaView 
           style={{ 
