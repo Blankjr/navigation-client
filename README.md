@@ -69,9 +69,22 @@ npm run ios
 To create an APK build:
 
 ```bash
-# For Android (local build)
-eas build -p android --local --profile preview
+# Important: Clean build folders before switching between build variants
+rm -rf android/  # On Unix-based systems
+# or
+rd /s /q android # On Windows
 ```
+```bash
+# For development build
+npm run dev
+
+# For preview build
+npm run build-preview
+
+# For production build
+npm run build-production
+```
+> **Important**: It's recommended to delete the local android folder before switching between different build variants (dev/preview/production). This prevents package name issues caused by Expo caching the previous build configuration. For example, without cleaning, you might end up with a production build using the preview package name (com.blankjr.navigationclient.preview).
 
 ## Project Structure
 
