@@ -170,7 +170,12 @@ export default function RootLayout() {
       <PaperProvider theme={theme}>
         <View style={{
             backgroundColor: isDarkMode ? '#000000' : '#FFFFFF',
-            paddingTop: 30
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 40,
+            zIndex: 1
           }}>
             <StatusBar 
               style={isDarkMode ? 'light' : 'dark'}
